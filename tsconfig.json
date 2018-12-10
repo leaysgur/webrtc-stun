@@ -11,7 +11,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "./src"
+    "./stun"
   ],
   "exclude": [
     "./node_modules"
