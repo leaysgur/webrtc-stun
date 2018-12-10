@@ -3,7 +3,7 @@
  * https://tools.ietf.org/html/rfc5389
  */
 import * as dgram from 'dgram';
-import { createBindingRequest } from './message';
+import { createBindingRequest } from './stun';
 
 const socket = dgram.createSocket({ type: 'udp4' });
 
