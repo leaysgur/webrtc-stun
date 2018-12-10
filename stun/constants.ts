@@ -1,8 +1,8 @@
 const MESSAGE_CLASS = {
   REQUEST: 0b00,
-  INDICATION: 0b01,
-  RESPONSE_SUCCESS: 0b10,
-  RESPONSE_ERROR: 0b11,
+  // INDICATION: 0b01,
+  // RESPONSE_SUCCESS: 0b10,
+  // RESPONSE_ERROR: 0b11,
 };
 
 const MESSAGE_METHOD = {
@@ -17,6 +17,10 @@ export const MESSAGE_TYPE = {
 };
 
 export const MAGIC_COOKIE = 0x2112a442;
+
+export const ATTRIBUTE_TYPE = {
+  SOFTWARE: 0x8022,
+};
 
 /**
  *  0                 1

@@ -1,11 +1,6 @@
 /*
  * RFC 5389
  * https://tools.ietf.org/html/rfc5389
- *
- * - [x] raw request
- * - [ ] classed request
- *   - [ ] add SOFTWARE attr
- * - [ ] receive response
  */
 import * as dgram from 'dgram';
 import { createBindingRequest } from './message';
