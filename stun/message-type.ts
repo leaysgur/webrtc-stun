@@ -3,8 +3,8 @@ import { numberToStringWithRadixAndPadding } from './utils';
 const MESSAGE_CLASS = {
   REQUEST: 0b00,
   // INDICATION: 0b01,
-  // RESPONSE_SUCCESS: 0b10,
-  // RESPONSE_ERROR: 0b11,
+  RESPONSE_SUCCESS: 0b10,
+  RESPONSE_ERROR: 0b11,
 };
 
 const MESSAGE_METHOD = {
@@ -13,8 +13,8 @@ const MESSAGE_METHOD = {
 
 export const BINDING_REQUEST = calcMessageType(MESSAGE_METHOD.BINDING, MESSAGE_CLASS.REQUEST);
 // BINDING_INDICATION: calcMessageType(MESSAGE_METHOD.BINDING, MESSAGE_CLASS.INDICATION);
-// BINDING_RESPONSE_SUCCESS: calcMessageType(MESSAGE_METHOD.BINDING, MESSAGE_CLASS.RESPONSE_SUCCESS);
-// BINDING_RESPONSE_ERROR: calcMessageType(MESSAGE_METHOD.BINDING, MESSAGE_CLASS.RESPONSE_ERROR);
+export const BINDING_RESPONSE_SUCCESS = calcMessageType(MESSAGE_METHOD.BINDING, MESSAGE_CLASS.RESPONSE_SUCCESS);
+export const BINDING_RESPONSE_ERROR = calcMessageType(MESSAGE_METHOD.BINDING, MESSAGE_CLASS.RESPONSE_ERROR);
 
 /**
  *  0                 1
@@ -30,13 +30,13 @@ export const BINDING_REQUEST = calcMessageType(MESSAGE_METHOD.BINDING, MESSAGE_C
  * and combined together as 14bit string,
  * and append first 2bit as `00`.
  *
- * Then STUN Message Type is 16bit binary string.
- * Finally we return it as hex number.
+ * Thus STUN Message Type becomes 16bit,
+ * and finally it is returned as number.
  *
- * BINDING_REQUEST: 0x0001
- * BINDING_INDICATION: 0x0011
- * BINDING_RESPONSE_SUCCESS: 0x0101
- * BINDING_RESPONSE_ERROR: 0x0111
+ * BINDING_REQUEST: 0x0001 = 1
+ * BINDING_INDICATION: 0x0011 = 17
+ * BINDING_RESPONSE_SUCCESS: 0x0101 = 257
+ * BINDING_RESPONSE_ERROR: 0x0111 = 273
  */
 function calcMessageType(method: number, klass: number): number {
   const methodStr = numberToStringWithRadixAndPadding(method, 2, 12);
@@ -48,7 +48,7 @@ function calcMessageType(method: number, klass: number): number {
   const c1 = classStr.slice(0, 1);
   const c2 = classStr.slice(1, 2);
 
+  // 16bit string
   const binStr = `00${m1}${c1}${m2}${c2}${m3}`;
-  const hexStr = numberToStringWithRadixAndPadding(binStr, 16, 4);
-  return parseInt(hexStr, 16);
+  return parseInt(binStr, 2);
 }

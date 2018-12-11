@@ -3,14 +3,14 @@
  *
  * (1, 2, 4) -> 0001
  * (10, 2, 4) -> 1010
- * (257,16,4) -> 0101
+ * (257, 16, 8) -> 00000101
  */
 export function numberToStringWithRadixAndPadding(
-  num: number | string,
+  num: number,
   radix: number = 2,
   digit: number = 0
 ): string {
-  return Number(num).toString(radix).padStart(digit, '0');
+  return num.toString(radix).padStart(digit, '0');
 }
 
 /**
