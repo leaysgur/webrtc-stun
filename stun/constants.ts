@@ -1,3 +1,5 @@
+import { numberToStringWithRadixAndPadding } from './utils';
+
 const MESSAGE_CLASS = {
   REQUEST: 0b00,
   // INDICATION: 0b01,
@@ -57,19 +59,4 @@ function getMessageType(method: number, klass: number): number {
   const binStr = `00${m1}${c1}${m2}${c2}${m3}`;
   const hexStr = numberToStringWithRadixAndPadding(binStr, 16, 4);
   return parseInt(hexStr, 16);
-}
-
-/**
- *
- * (1, 2, 4) -> 0001
- * (10, 2, 4) -> 1010
- * (257,16,4) -> 0101
- *
- */
-function numberToStringWithRadixAndPadding(
-  num: number | string,
-  radix: number = 2,
-  digit: number = 0
-): string {
-  return Number(num).toString(radix).padStart(digit, '0');
 }
