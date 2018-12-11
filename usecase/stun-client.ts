@@ -18,8 +18,7 @@ socket.on('message', (msg: Buffer) => {
   }
 
   const { header, attrs } = parseMessage(msg);
-  // TODO: Type missing...why...
-  console.log(attrs);
+  console.log(attrs.keys());
   console.log('SOFTWARE ?', attrs.has(SOFTWARE));
   console.log('XOR_MAPPED_ADDRESS', attrs.has(XOR_MAPPED_ADDRESS));
 

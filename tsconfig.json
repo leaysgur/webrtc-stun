@@ -11,6 +11,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
+    "./usecase",
     "./stun"
   ],
   "exclude": [
