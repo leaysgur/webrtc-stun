@@ -13,18 +13,18 @@ interface Attribute {
 }
 
 export function createBindingRequest(): Buffer {
-  const body = Buffer.concat([
+  const attrs = Buffer.concat([
     // SHOULD
     createSoftware('webrtc-stack-study'),
   ]);
 
-  // body size is needed for message length
+  // attrs size is needed for message length
   const header = createHeader(
     BINDING_REQUEST,
-    body.length
+    attrs.length
   );
 
-  return Buffer.concat([header, body]);
+  return Buffer.concat([header, attrs]);
 }
 
 export function isStunMessage(msg: Buffer): boolean {
@@ -46,18 +46,18 @@ export function parseHeader(msg: Buffer): Header {
 
 export function parseAttributes(msg: Buffer): Attribute[] {
   // STUN Message Header is 20byte, rest is attributes
-  const body = msg.slice(20, msg.length);
+  const attrs = msg.slice(20, msg.length);
 
-  const attrs: Map<number, Attribute> = new Map();
+  const parsedAttrs: Map<number, Attribute> = new Map();
   let offset = 0;
-  while (offset < body.length) {
-    const type = body.readUInt16BE(offset);
+  while (offset < attrs.length) {
+    const type = attrs.readUInt16BE(offset);
     offset += 2; // 16bit = 2byte
 
-    const length = body.readUInt16BE(offset);
+    const length = attrs.readUInt16BE(offset);
     offset += 2; // 16bit = 2byte
 
-    const value = body.slice(offset, offset + length);
+    const value = attrs.slice(offset, offset + length);
     offset += length;
 
     // STUN Attribute must be in 32bit(= 4byte) boundary
@@ -65,11 +65,11 @@ export function parseAttributes(msg: Buffer): Attribute[] {
     offset += paddingByte;
 
     // skip duplicates
-    if (attrs.has(type)) {
+    if (parsedAttrs.has(type)) {
       continue;
     }
-    attrs.set(type, { type, length, value });
+    parsedAttrs.set(type, { type, length, value });
   }
 
-  return [...attrs.values()];
+  return [...parsedAttrs.values()];
 }
