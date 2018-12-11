@@ -1,4 +1,3 @@
-import { ATTRIBUTE_TYPE } from './constants';
 import { calcPaddingByte } from './utils';
 
 /**
@@ -20,7 +19,7 @@ export function createSoftware(softwareName: string): Buffer {
 
   // 2byte(16bit) for type
   const type = Buffer.alloc(2);
-  type.writeUInt16BE(ATTRIBUTE_TYPE.SOFTWARE, 0);
+  type.writeUInt16BE(0x8022, 0);
 
   // 2byte(16bit) for length
   const length = Buffer.alloc(2);
