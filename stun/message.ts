@@ -1,5 +1,5 @@
 import { createHeader } from './header';
-import { createSoftware } from './attribute';
+import { createSoftwareAttribute } from './attribute';
 import { BINDING_REQUEST } from './message-type';
 import { numberToStringWithRadixAndPadding, calcPaddingByte } from './utils';
 
@@ -15,7 +15,7 @@ interface Attribute {
 export function createBindingRequest(): Buffer {
   const attrs = Buffer.concat([
     // SHOULD
-    createSoftware('webrtc-stack-study'),
+    createSoftwareAttribute('webrtc-stack-study'),
   ]);
 
   // attrs size is needed for message length

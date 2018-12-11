@@ -13,7 +13,7 @@ import { calcPaddingByte } from './utils';
  *
  * Value is N * 32 bit w/ padding bit (= 4N byte)
  */
-export function createSoftware(softwareName: string): Buffer {
+export function createSoftwareAttribute(softwareName: string): Buffer {
   // allocate dynamically for value
   const value = Buffer.from(softwareName);
 
