@@ -1,6 +1,3 @@
-import { createHeader } from './header';
-import { createSoftwareAttribute } from './attribute';
-import { BINDING_REQUEST } from './message-type';
 import { numberToStringWithRadixAndPadding, calcPaddingByte } from './utils';
 
 interface Message {
@@ -14,21 +11,6 @@ interface Attribute {
   type: number;
   length: number;
   value: Buffer;
-}
-
-export function createBindingRequest(): Buffer {
-  const attrs = Buffer.concat([
-    // SHOULD
-    createSoftwareAttribute('webrtc-stack-study'),
-  ]);
-
-  // attrs size is needed for message length
-  const header = createHeader(
-    BINDING_REQUEST,
-    attrs.length
-  );
-
-  return Buffer.concat([header, attrs]);
 }
 
 export function isStunMessage(msg: Buffer): boolean {
@@ -50,20 +32,15 @@ export function parseMessage(msg: Buffer): Message {
   };
 }
 
-function parseHeader(msg: Buffer): Header {
-  // STUN Message Header is 20byte = 160bit
-  const header = msg.slice(0, 20);
-
+function parseHeader(header: Buffer): Header {
   const type = header.readUInt16BE(0);
 
   return { type };
 }
 
-function parseAttributes(msg: Buffer): Attribute[] {
-  // STUN Message Header is 20byte, rest is attributes
-  const attrs = msg.slice(20, msg.length);
-
+function parseAttributes(attrs: Buffer): Attribute[] {
   const parsedAttrs: Map<number, Attribute> = new Map();
+
   let offset = 0;
   while (offset < attrs.length) {
     const type = attrs.readUInt16BE(offset);
