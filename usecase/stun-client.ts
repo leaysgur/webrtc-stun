@@ -13,12 +13,16 @@ socket.on('message', (msg: Buffer) => {
     return;
   }
 
-  console.log('recv:', msg.toString('hex'));
+  console.log(`recv: ${msg.length}byte`);
+  console.log(msg.toString('hex'));
   console.log(parseAttributes(msg));
   socket.close();
 });
 socket.bind(12345);
 
 const packet = createBindingRequest();
-// console.log(parseAttributes(packet));
+console.log(`send: ${packet.length}byte`);
+console.log(packet.toString('hex'));
+console.log(parseAttributes(packet));
+console.log();
 socket.send(packet, 19302, 'stun.l.google.com');
