@@ -15,9 +15,8 @@ import { ATTRIBUTE_TYPE } from './constants';
  * TODO: impl
  *
  */
-export function createSoftware(): Buffer {
+export function createSoftware(softwareName: string): Buffer {
   // allocate dynamically for value
-  const softwareName = 'webrtc-stack-study';
   const value = Buffer.from(softwareName);
 
   // 2byte(16bit) for type

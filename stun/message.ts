@@ -5,7 +5,7 @@ import { numberToStringWithRadixAndPadding } from './utils';
 export function createBindingRequest(): Buffer {
   const body = Buffer.concat([
     // SHOULD
-    createSoftware(),
+    createSoftware('webrtc-stack-study'),
   ]);
 
   // body size is needed for message length
