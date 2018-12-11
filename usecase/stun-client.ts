@@ -34,5 +34,5 @@ socket.on('message', (msg: Buffer) => {
 socket.bind(12345);
 
 const packet = createBindingRequest();
-socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
-// socket.send(packet, 19302, 'stun.l.google.com');
+// socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
+socket.send(packet, 19302, 'stun.l.google.com');
