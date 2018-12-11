@@ -1,5 +1,9 @@
 import * as dgram from 'dgram';
-import { createBindingRequest, isStunMessage } from '../stun';
+import {
+  createBindingRequest,
+  isStunMessage,
+  parseAttributes,
+} from '../stun';
 
 const socket = dgram.createSocket({ type: 'udp4' });
 socket.on('message', (msg: Buffer) => {
@@ -9,10 +13,12 @@ socket.on('message', (msg: Buffer) => {
     return;
   }
 
-  console.log('recv', msg.toString('hex'));
+  console.log('recv:', msg.toString('hex'));
+  console.log(parseAttributes(msg));
   socket.close();
 });
 socket.bind(12345);
 
 const packet = createBindingRequest();
+// console.log(parseAttributes(packet));
 socket.send(packet, 19302, 'stun.l.google.com');
