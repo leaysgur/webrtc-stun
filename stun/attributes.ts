@@ -6,11 +6,6 @@ export interface Attribute {
   value: Buffer;
 }
 
-function create() {
-  // TODO: type[]をもらう
-  // それでxxxAttr.create()
-}
-
 function parse(attrs: Buffer): Attribute[] {
   const parsedAttrs: Map<number, Attribute> = new Map();
 
@@ -24,6 +19,7 @@ function parse(attrs: Buffer): Attribute[] {
 
     const value = attrs.slice(offset, offset + length);
     offset += length;
+    // TODO: parseAttrValue by type
 
     // STUN Attribute must be in 32bit(= 4byte) boundary
     const paddingByte = calcPaddingByte(length, 4);
@@ -39,4 +35,4 @@ function parse(attrs: Buffer): Attribute[] {
   return [...parsedAttrs.values()];
 }
 
-export default { create, parse }
+export default { parse }

@@ -11,6 +11,6 @@ export function createBindingRequest(): Buffer {
   return Buffer.concat([
     // attrs size is needed for message length
     header.create(BINDING_REQUEST, attrs.length),
-    attrs
+    attrs,
   ]);
 }
