@@ -1,5 +1,12 @@
 import * as crypto from 'crypto';
 
+export interface Header {
+  type: number;
+  length: number;
+  magicCookie: number;
+  // TODO: transactionId
+}
+
 /*
  * - STUN Message
  *   - ヘッダ（20byte）
@@ -20,7 +27,7 @@ import * as crypto from 'crypto';
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-export function createHeader(messageType: number, attrByte: number): Buffer {
+function create(messageType: number, attrByte: number): Buffer {
   // STUN Message Header is 20byte = 160bit
   const header = Buffer.alloc(20);
   // 000 - 015bit(16bit = 2byte): Message type
@@ -35,3 +42,13 @@ export function createHeader(messageType: number, attrByte: number): Buffer {
 
   return header;
 }
+
+function parse(header: Buffer): Header {
+  const type = header.readUInt16BE(0);
+  const length = header.readUInt16BE(2);
+  const magicCookie = header.readUInt32BE(4);
+
+  return { type, length, magicCookie };
+}
+
+export default { create, parse }

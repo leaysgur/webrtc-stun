@@ -1,18 +1,16 @@
-import { createHeader } from './header';
+import header from './header';
 import { BINDING_REQUEST } from './message-type';
-import { createSoftwareAttribute } from './attribute';
+import softwareAtrr from './attribute/software';
 
 export function createBindingRequest(): Buffer {
   const attrs = Buffer.concat([
     // SHOULD
-    createSoftwareAttribute('webrtc-stack-study'),
+    softwareAtrr.create('webrtc-stack-study'),
   ]);
 
-  // attrs size is needed for message length
-  const header = createHeader(
-    BINDING_REQUEST,
-    attrs.length
-  );
-
-  return Buffer.concat([header, attrs]);
+  return Buffer.concat([
+    // attrs size is needed for message length
+    header.create(BINDING_REQUEST, attrs.length),
+    attrs
+  ]);
 }
