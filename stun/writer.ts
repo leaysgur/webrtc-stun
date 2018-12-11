@@ -1,6 +1,6 @@
-import header from './header';
+import header from './internal/header';
+import softwareAtrr from './internal/attribute/software';
 import { BINDING_REQUEST } from './message-type';
-import softwareAtrr from './attribute/software';
 
 export function createBindingRequest(): Buffer {
   const attrs = Buffer.concat([

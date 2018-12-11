@@ -1,6 +1,6 @@
-import header, { Header } from './header';
-import attributes, { Attribute } from './attributes';
-import { numberToStringWithRadixAndPadding } from './utils';
+import header, { Header } from './internal/header';
+import attributes, { Attribute } from './internal/attributes';
+import { numberToStringWithRadixAndPadding } from './internal/utils';
 
 interface Message {
   header: Header;

@@ -1,4 +1,4 @@
-import { SOFTWARE } from '../attribute-type';
+import { SOFTWARE } from '../../attribute-type';
 import { calcPaddingByte } from '../utils';
 
 function create(softwareName: string): Buffer {
@@ -21,6 +21,8 @@ function create(softwareName: string): Buffer {
   return Buffer.concat([type, length, value, padding]);
 }
 
-function parse() {}
+function parse() {
+  // TODO: impl
+}
 
 export default { create, parse }

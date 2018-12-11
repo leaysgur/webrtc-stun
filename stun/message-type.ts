@@ -1,4 +1,4 @@
-import { numberToStringWithRadixAndPadding } from './utils';
+import { numberToStringWithRadixAndPadding } from './internal/utils';
 
 const MESSAGE_CLASS = {
   REQUEST: 0b00,
