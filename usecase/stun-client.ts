@@ -5,6 +5,8 @@ import {
   parseMessage,
   BINDING_RESPONSE_SUCCESS,
   BINDING_RESPONSE_ERROR,
+  XOR_MAPPED_ADDRESS,
+  SOFTWARE,
 } from '../stun';
 
 const socket = dgram.createSocket({ type: 'udp4' });
@@ -16,9 +18,10 @@ socket.on('message', (msg: Buffer) => {
   }
 
   const { header, attrs } = parseMessage(msg);
-  for (const attr of attrs) {
-    console.log(attr);
-  }
+  // TODO: Type missing...why...
+  console.log(attrs);
+  console.log('SOFTWARE ?', attrs.has(SOFTWARE));
+  console.log('XOR_MAPPED_ADDRESS', attrs.has(XOR_MAPPED_ADDRESS));
 
   switch (header.type) {
     case BINDING_RESPONSE_SUCCESS:
@@ -34,5 +37,5 @@ socket.on('message', (msg: Buffer) => {
 socket.bind(12345);
 
 const packet = createBindingRequest();
-// socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
-socket.send(packet, 19302, 'stun.l.google.com');
+socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
+// socket.send(packet, 19302, 'stun.l.google.com');

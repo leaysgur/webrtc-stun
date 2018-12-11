@@ -1,10 +1,10 @@
 import header, { Header } from './internal/header';
-import attributes, { Attribute } from './internal/attributes';
+import attributes, { Attributes } from './internal/attributes';
 import { numberToStringWithRadixAndPadding } from './internal/utils';
 
 interface Message {
   header: Header;
-  attrs: Attribute[];
+  attrs: Attributes;
 }
 
 export function isStunMessage(msg: Buffer): boolean {

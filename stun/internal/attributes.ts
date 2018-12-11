@@ -1,13 +1,14 @@
 import { calcPaddingByte } from './utils';
 
-export interface Attribute {
+interface Attribute {
   type: number;
   length: number;
   value: Buffer;
 }
+export type Attributes = Map<number, Attribute>;
 
-function parse(attrs: Buffer): Attribute[] {
-  const parsedAttrs: Map<number, Attribute> = new Map();
+function parse(attrs: Buffer): Attributes {
+  const parsedAttrs: Attributes = new Map();
 
   let offset = 0;
   while (offset < attrs.length) {
@@ -32,7 +33,7 @@ function parse(attrs: Buffer): Attribute[] {
     parsedAttrs.set(type, { type, length, value });
   }
 
-  return [...parsedAttrs.values()];
+  return parsedAttrs;
 }
 
 export default { parse }
