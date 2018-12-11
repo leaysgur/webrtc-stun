@@ -3,6 +3,10 @@ import { createSoftwareAttribute } from './attribute';
 import { BINDING_REQUEST } from './message-type';
 import { numberToStringWithRadixAndPadding, calcPaddingByte } from './utils';
 
+interface Message {
+  header: Header;
+  attrs: Attribute[];
+}
 interface Header {
   type: number;
 }
@@ -35,7 +39,18 @@ export function isStunMessage(msg: Buffer): boolean {
   return first8bit.charAt(0) === '0' && first8bit.charAt(1) === '0';
 }
 
-export function parseHeader(msg: Buffer): Header {
+export function parseMessage(msg: Buffer): Message {
+  // STUN Message Header is 20byte = 160bit
+  const header = msg.slice(0, 20);
+  const attrs = msg.slice(20, msg.length);
+
+  return {
+    header: parseHeader(header),
+    attrs: parseAttributes(attrs),
+  };
+}
+
+function parseHeader(msg: Buffer): Header {
   // STUN Message Header is 20byte = 160bit
   const header = msg.slice(0, 20);
 
@@ -44,7 +59,7 @@ export function parseHeader(msg: Buffer): Header {
   return { type };
 }
 
-export function parseAttributes(msg: Buffer): Attribute[] {
+function parseAttributes(msg: Buffer): Attribute[] {
   // STUN Message Header is 20byte, rest is attributes
   const attrs = msg.slice(20, msg.length);
 
