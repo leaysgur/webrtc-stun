@@ -1,4 +1,5 @@
 import { ATTRIBUTE_TYPE } from './constants';
+import { calcPaddingByte } from './utils';
 
 /**
  * STUN Attribute
@@ -11,9 +12,7 @@ import { ATTRIBUTE_TYPE } from './constants';
  * |                        Value (variable)                    ....
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
- * Value is N * 32bit w/ padding bit
- * TODO: impl
- *
+ * Value is N * 32 bit w/ padding bit (= 4N byte)
  */
 export function createSoftware(softwareName: string): Buffer {
   // allocate dynamically for value
@@ -27,5 +26,9 @@ export function createSoftware(softwareName: string): Buffer {
   const length = Buffer.alloc(2);
   length.writeUInt16BE(value.length, 0);
 
-  return Buffer.concat([type, length, value]);
+  // pad missing bytes
+  const paddingByte = calcPaddingByte(value.length, 4);
+  const padding = Buffer.alloc(paddingByte);
+
+  return Buffer.concat([type, length, value, padding]);
 }

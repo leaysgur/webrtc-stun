@@ -1,6 +1,6 @@
 import { createHeader } from './header';
 import { createSoftware } from './attribute';
-import { numberToStringWithRadixAndPadding } from './utils';
+import { numberToStringWithRadixAndPadding, calcPaddingByte } from './utils';
 
 export function createBindingRequest(): Buffer {
   const body = Buffer.concat([
@@ -41,15 +41,14 @@ export function parseAttributes(msg: Buffer): Attribute[] {
     offset += length;
 
     // STUN Attributes are in 32bit(4byte) boundary
-    const missingBoundaryByte = length % 4;
-    const paddingByte = missingBoundaryByte === 0 ? 0 : 4 - missingBoundaryByte;
+    const paddingByte = calcPaddingByte(length, 4);
     offset += paddingByte;
 
-    console.log('------');
+    console.log('--- Attr ---');
     console.log(`type: 0x${numberToStringWithRadixAndPadding(type, 16, 4)}`);
-    console.log(`length: ${length}byte`);
+    console.log(`length: ${length}byte(+ pad: ${paddingByte}byte)`);
     console.log(`value: ${value.toString('hex')}`);
-    console.log('------');
+    console.log('--- /Attr ---');
   }
 
   return [];
