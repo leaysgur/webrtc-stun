@@ -35,4 +35,4 @@ function parse(attrs: Buffer): Attributes {
   return parsedAttrs;
 }
 
-export default { parse }
+export default { parse };

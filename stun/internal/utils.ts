@@ -8,7 +8,7 @@
 export function numberToStringWithRadixAndPadding(
   num: number,
   radix: number = 2,
-  digit: number = 0
+  digit: number = 0,
 ): string {
   return num.toString(radix).padStart(digit, '0');
 }

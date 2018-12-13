@@ -25,4 +25,4 @@ function parse(buffer: Buffer): string {
   return buffer.toString();
 }
 
-export default { create, parse }
+export default { create, parse };

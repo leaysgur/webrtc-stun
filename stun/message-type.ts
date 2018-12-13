@@ -46,7 +46,7 @@ function calcMessageType(method: number, klass: number): number {
 
   const m1 = methodStr.slice(0, 5);
   const m2 = methodStr.slice(5, 8);
-  const m3 = methodStr.slice(8, 12)
+  const m3 = methodStr.slice(8, 12);
   const c1 = classStr.slice(0, 1);
   const c2 = classStr.slice(1, 2);
 

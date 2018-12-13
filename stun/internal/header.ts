@@ -49,4 +49,4 @@ function parse(header: Buffer): Header {
   return { type, length, magicCookie, transactionId };
 }
 
-export default { create, parse }
+export default { create, parse };

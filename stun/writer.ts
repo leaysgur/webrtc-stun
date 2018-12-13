@@ -1,6 +1,6 @@
 import header from './internal/header';
 import softwareAtrr from './internal/attribute/software';
-import { BINDING_REQUEST } from './message-type';
+import { STUN_MESSAGE_TYPE } from './message-type';
 
 export function createStunBindingRequest(softwareName: string): Buffer {
   const attrs = Buffer.concat([
@@ -10,7 +10,7 @@ export function createStunBindingRequest(softwareName: string): Buffer {
 
   return Buffer.concat([
     // attrs size is needed for message length
-    header.create(BINDING_REQUEST, attrs.length),
+    header.create(STUN_MESSAGE_TYPE.BINDING_REQUEST, attrs.length),
     attrs,
   ]);
 }
