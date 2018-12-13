@@ -1,5 +1,7 @@
-// Required types
-export const XOR_MAPPED_ADDRESS = 0x0020;
+export const STUN_ATTRIBUTE_TYPE = {
+  // Required types
+  XOR_MAPPED_ADDRESS: 0x0020,
 
-// Optional types
-export const SOFTWARE = 0x8022;
+  // Optional types
+  SOFTWARE: 0x8022,
+};

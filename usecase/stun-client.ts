@@ -3,10 +3,8 @@ import {
   createStunBindingRequest,
   isStunMessage,
   parseStunMessage,
-  BINDING_RESPONSE_SUCCESS,
-  BINDING_RESPONSE_ERROR,
-  XOR_MAPPED_ADDRESS,
-  SOFTWARE,
+  STUN_MESSAGE_TYPE,
+  STUN_ATTRIBUTE_TYPE,
 } from '../stun';
 
 const socket = dgram.createSocket({ type: 'udp4' });
@@ -21,14 +19,14 @@ socket.on('message', (msg: Buffer) => {
   console.log(msg.toString('hex'));
   const { header, attrs } = parseStunMessage(msg);
   console.log(attrs.keys());
-  console.log('SOFTWARE ?', attrs.has(SOFTWARE));
-  console.log('XOR_MAPPED_ADDRESS', attrs.has(XOR_MAPPED_ADDRESS));
+  console.log('SOFTWARE ?', attrs.has(STUN_ATTRIBUTE_TYPE.SOFTWARE));
+  console.log('XOR_MAPPED_ADDRESS', attrs.has(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS));
 
   switch (header.type) {
-    case BINDING_RESPONSE_SUCCESS:
+    case STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS:
       console.log('BINDING_RESPONSE_SUCCESS');
       break;
-    case BINDING_RESPONSE_ERROR:
+    case STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR:
       console.log('BINDING_RESPONSE_ERROR');
       break;
   }
