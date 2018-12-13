@@ -1,4 +1,4 @@
-import { SOFTWARE } from '../../attribute-type';
+import { STUN_ATTRIBUTE_TYPE } from '../../attribute-type';
 import { calcPaddingByte } from '../utils';
 
 function create(softwareName: string): Buffer {
@@ -7,7 +7,7 @@ function create(softwareName: string): Buffer {
 
   // 2byte(16bit) for type
   const type = Buffer.alloc(2);
-  type.writeUInt16BE(SOFTWARE, 0);
+  type.writeUInt16BE(STUN_ATTRIBUTE_TYPE.SOFTWARE, 0);
 
   // 2byte(16bit) for length
   const length = Buffer.alloc(2);
@@ -21,8 +21,8 @@ function create(softwareName: string): Buffer {
   return Buffer.concat([type, length, value, padding]);
 }
 
-function parse() {
-  // TODO: impl
+function parse(buffer: Buffer): string {
+  return buffer.toString();
 }
 
 export default { create, parse }

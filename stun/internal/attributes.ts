@@ -20,7 +20,6 @@ function parse(attrs: Buffer): Attributes {
 
     const value = attrs.slice(offset, offset + length);
     offset += length;
-    // TODO: parseAttrValue by type
 
     // STUN Attribute must be in 32bit(= 4byte) boundary
     const paddingByte = calcPaddingByte(length, 4);
