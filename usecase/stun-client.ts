@@ -1,8 +1,8 @@
 import * as dgram from 'dgram';
 import {
-  createBindingRequest,
+  createStunBindingRequest,
   isStunMessage,
-  parseMessage,
+  parseStunMessage,
   BINDING_RESPONSE_SUCCESS,
   BINDING_RESPONSE_ERROR,
   XOR_MAPPED_ADDRESS,
@@ -17,7 +17,9 @@ socket.on('message', (msg: Buffer) => {
     return;
   }
 
-  const { header, attrs } = parseMessage(msg);
+  console.log('recv');
+  console.log(msg.toString('hex'));
+  const { header, attrs } = parseStunMessage(msg);
   console.log(attrs.keys());
   console.log('SOFTWARE ?', attrs.has(SOFTWARE));
   console.log('XOR_MAPPED_ADDRESS', attrs.has(XOR_MAPPED_ADDRESS));
@@ -35,6 +37,8 @@ socket.on('message', (msg: Buffer) => {
 });
 socket.bind(12345);
 
-const packet = createBindingRequest();
+const packet = createStunBindingRequest('webrtc-stack-study');
+console.log('send');
+console.log(packet.toString('hex'));
 socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
 // socket.send(packet, 19302, 'stun.l.google.com');

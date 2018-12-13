@@ -2,10 +2,10 @@ import header from './internal/header';
 import softwareAtrr from './internal/attribute/software';
 import { BINDING_REQUEST } from './message-type';
 
-export function createBindingRequest(): Buffer {
+export function createStunBindingRequest(softwareName: string): Buffer {
   const attrs = Buffer.concat([
     // SHOULD
-    softwareAtrr.create('webrtc-stack-study'),
+    softwareAtrr.create(softwareName),
   ]);
 
   return Buffer.concat([
