@@ -28,9 +28,9 @@ function parseXorMappedAddress(buf: Buffer, magicCookie: number) {
   }[family];
 
   const xport = buf.readUInt16BE(2);
-  // tslint:disable-next-line:no-bitwise
+  // use first 16bit
   const mc16bit = magicCookie >> 16;
-  // tslint:disable-next-line:no-bitwise
+  // XOR
   const port = xport ^ mc16bit;
 
   // TODO: xaddress
