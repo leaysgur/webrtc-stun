@@ -26,35 +26,40 @@ interface XorMappedAddress {
   address: string;
 }
 function parseXorMappedAddress(buf: Buffer, header: Buffer): XorMappedAddress {
+  const familyVal = buf.readUInt16BE(0);
   const family = {
     [`${0x01}`]: 4,
     [`${0x02}`]: 6,
-  }[buf.readUInt16BE(0)];
+  }[familyVal];
 
   const port = parsePort(buf, header);
-  const address = family === 4 ? parseIpV4(buf, header) : parseIpV6(buf, header);
+
+  const address = {
+    [`${0x01}`]: parseIpV4(buf, header),
+    [`${0x02}`]: parseIpV6(buf, header),
+  }[familyVal];
 
   return { family, port, address };
 }
 
-function parsePort(attrBuf: Buffer, headBuf: Buffer): number {
-  const xport = attrBuf.slice(2, 4);
-  const mc = headBuf.slice(4, 8);
+function parsePort(attr: Buffer, header: Buffer): number {
+  const xport = attr.slice(2, 4);
+  const mc = header.slice(4, 6);
 
-  const xored = bufferXor(xport, mc.slice(0, 2));
-  return xored.readUInt16LE(0);
+  const xored = bufferXor(xport, mc);
+  return xored.readUInt16BE(0);
 }
-function parseIpV4(attrBuf: Buffer, headBuf: Buffer): string {
-  const xaddress = attrBuf.slice(4, 8);
-  const mc = headBuf.slice(4, 8);
+function parseIpV4(attr: Buffer, header: Buffer): string {
+  const xaddress = attr.slice(4, 8);
+  const mc = header.slice(4, 8);
 
   const xored = bufferXor(xaddress, mc);
   return ipV4BufferToString(xored);
 }
-function parseIpV6(attrBuf: Buffer, headBuf: Buffer): string {
-  const xaddress = attrBuf.slice(4, 20);
-  const mc = headBuf.slice(4, 8);
-  const tid = headBuf.slice(8, 20);
+function parseIpV6(attr: Buffer, header: Buffer): string {
+  const xaddress = attr.slice(4, 20);
+  const mc = header.slice(4, 8);
+  const tid = header.slice(8, 20);
 
   const xored = bufferXor(xaddress, Buffer.concat([mc, tid]));
   return ipV6BufferToString(xored);
@@ -64,26 +69,27 @@ function bufferXor(a: Buffer, b: Buffer): Buffer {
   const length = Math.max(a.length, b.length);
   const buffer = Buffer.allocUnsafe(length);
 
-  for (let i = 0; i < length; ++i) {
+  for (let i = 0; i < length; i++) {
     buffer[i] = a[i] ^ b[i];
   }
 
   return buffer;
 }
 function ipV4BufferToString(buf: Buffer): string {
-  const ipV4Arr = [];
+  const res = [];
   for (const digit of buf) {
-    ipV4Arr.push(digit);
+    res.push(digit);
   }
-  return ipV4Arr.join('.');
+  return res.join('.');
 }
 function ipV6BufferToString(buf: Buffer): string {
-  // TODO: impl
-  const ipV4Arr = [];
-  for (const digit of buf) {
-    ipV4Arr.push(digit);
+  const res = [];
+  for (let i = 0; i < buf.length; i += 2) {
+    res.push(buf.readUInt16BE(i).toString(16));
   }
-  return ipV4Arr.join(':');
+  return res.join(':')
+    .replace(/(^|:)0(:0)*:0(:|$)/, '$1::$3')
+    .replace(/:{3,4}/, '::');
 }
 
 const socket = dgram.createSocket({ type: 'udp4' });
@@ -118,6 +124,5 @@ socket.on('message', (msg: Buffer) => {
 const packet = createStunBindingRequest('webrtc-stack-study');
 // console.log('send');
 // console.log(packet.toString('hex'));
-socket.bind(55555);
-// socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
-socket.send(packet, 19302, 'stun.l.google.com');
+socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
+// socket.send(packet, 19302, 'stun.l.google.com');
