@@ -20,22 +20,70 @@ import {
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *
  */
-function parseXorMappedAddress(buf: Buffer, magicCookie: number) {
-  const family = buf.readUInt16BE(0);
-  const ipVersion = {
-    [`${0x01}`]: 'IPv4',
-    [`${0x02}`]: 'IPv6',
-  }[family];
+interface XorMappedAddress {
+  family: number;
+  port: number;
+  address: string;
+}
+function parseXorMappedAddress(buf: Buffer, header: Buffer): XorMappedAddress {
+  const family = {
+    [`${0x01}`]: 4,
+    [`${0x02}`]: 6,
+  }[buf.readUInt16BE(0)];
 
-  const xport = buf.readUInt16BE(2);
-  // use first 16bit
-  const mc16bit = magicCookie >> 16;
-  // XOR
-  const port = xport ^ mc16bit;
+  const port = parsePort(buf, header);
+  const address = family === 4 ? parseIpV4(buf, header) : parseIpV6(buf, header);
 
-  // TODO: xaddress
+  return { family, port, address };
+}
 
-  return { ipVersion, port };
+function parsePort(attrBuf: Buffer, headBuf: Buffer): number {
+  const xport = attrBuf.slice(2, 4);
+  const mc = headBuf.slice(4, 8);
+
+  const xored = bufferXor(xport, mc.slice(0, 2));
+  return xored.readUInt16LE(0);
+}
+function parseIpV4(attrBuf: Buffer, headBuf: Buffer): string {
+  const xaddress = attrBuf.slice(4, 8);
+  const mc = headBuf.slice(4, 8);
+
+  const xored = bufferXor(xaddress, mc);
+  return ipV4BufferToString(xored);
+}
+function parseIpV6(attrBuf: Buffer, headBuf: Buffer): string {
+  const xaddress = attrBuf.slice(4, 20);
+  const mc = headBuf.slice(4, 8);
+  const tid = headBuf.slice(8, 20);
+
+  const xored = bufferXor(xaddress, Buffer.concat([mc, tid]));
+  return ipV6BufferToString(xored);
+}
+
+function bufferXor(a: Buffer, b: Buffer): Buffer {
+  const length = Math.max(a.length, b.length);
+  const buffer = Buffer.allocUnsafe(length);
+
+  for (let i = 0; i < length; ++i) {
+    buffer[i] = a[i] ^ b[i];
+  }
+
+  return buffer;
+}
+function ipV4BufferToString(buf: Buffer): string {
+  const ipV4Arr = [];
+  for (const digit of buf) {
+    ipV4Arr.push(digit);
+  }
+  return ipV4Arr.join('.');
+}
+function ipV6BufferToString(buf: Buffer): string {
+  // TODO: impl
+  const ipV4Arr = [];
+  for (const digit of buf) {
+    ipV4Arr.push(digit);
+  }
+  return ipV4Arr.join(':');
 }
 
 const socket = dgram.createSocket({ type: 'udp4' });
@@ -52,7 +100,8 @@ socket.on('message', (msg: Buffer) => {
   console.log(attrs.keys());
   console.log('SOFTWARE ?', attrs.has(STUN_ATTRIBUTE_TYPE.SOFTWARE));
   console.log('XOR_MAPPED_ADDRESS', attrs.has(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS));
-  console.log(parseXorMappedAddress(attrs.get(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS)!.value, header.magicCookie));
+  console.log(parseXorMappedAddress(attrs.get(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS)!.value, msg.slice(0, 20)));
+  // console.log(parseXorMappedAddress(attrs.get(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS)!.value, header.magicCookie));
 
   switch (header.type) {
     case STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS:
