@@ -1,12 +1,10 @@
 import * as dgram from 'dgram';
 import {
+  isStunMessage,
   StunMessage,
   Header,
   SoftwareAttribute,
-  isStunMessage,
-  // parseStunMessage,
   STUN_MESSAGE_TYPE,
-  // STUN_ATTRIBUTE_TYPE,
 } from '../stun';
 
 const socket = dgram.createSocket({ type: 'udp4' });
