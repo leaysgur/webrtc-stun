@@ -1,7 +1,8 @@
 import * as dgram from 'dgram';
 import {
   isStunMessage,
-  StunMessage,
+  createStunMessage,
+  parseStunMessage,
   Header,
   SoftwareAttribute,
   STUN_MESSAGE_TYPE,
@@ -16,7 +17,7 @@ socket.on('message', (msg: Buffer) => {
     return;
   }
 
-  const stunMsg = StunMessage.fromBuffer(msg);
+  const stunMsg = parseStunMessage(msg);
   console.log(stunMsg);
   // switch (header.type) {
   //   case STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS:
@@ -34,7 +35,6 @@ const header = new Header();
 header.setType(STUN_MESSAGE_TYPE.BINDING_REQUEST);
 const softwareAttr = new SoftwareAttribute('webrtc-stack-study');
 
-const packet = new StunMessage(header, [softwareAttr]).toBuffer();
-
+const packet = createStunMessage({ header, attrs: [softwareAttr] });
 socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
 // socket.send(packet, 19302, 'stun.l.google.com');
