@@ -32,16 +32,16 @@ export class Header {
     return header;
   }
 
-  private type: Buffer;
-  private length: Buffer;
+  private _type: Buffer;
+  private _length: Buffer;
   private _magicCookie: Buffer;
   private _transactionId: Buffer;
   constructor() {
-    this.type = Buffer.alloc(2);
-    this.type.writeUInt16BE(0, 0);
+    this._type = Buffer.alloc(2);
+    this._type.writeUInt16BE(0, 0);
 
-    this.length = Buffer.alloc(2);
-    this.length.writeUInt16BE(0, 0);
+    this._length = Buffer.alloc(2);
+    this._length.writeUInt16BE(0, 0);
 
     this._magicCookie = Buffer.alloc(4);
     this._magicCookie.writeUInt32BE(0x2112a442, 0);
@@ -59,12 +59,12 @@ export class Header {
 
   setType(val: number | Buffer) {
     const v = Buffer.isBuffer(val) ? val.readUInt16BE(0) : val;
-    this.type.writeUInt16BE(v, 0);
+    this._type.writeUInt16BE(v, 0);
   }
 
   setLength(val: number | Buffer) {
     const v = Buffer.isBuffer(val) ? val.readUInt16BE(0) : val;
-    this.length.writeUInt16BE(v, 0);
+    this._length.writeUInt16BE(v, 0);
   }
 
   setMagicCookie(val: number | Buffer) {
@@ -78,8 +78,8 @@ export class Header {
 
   toBuffer(): Buffer {
     return Buffer.concat([
-      this.type,
-      this.length,
+      this._type,
+      this._length,
       this._magicCookie,
       this._transactionId,
     ]);
