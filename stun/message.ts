@@ -8,11 +8,11 @@ import { STUN_ATTRIBUTE_TYPE } from './attribute-type';
 type Attributes = SoftwareAttribute | XorMappedAddressAttribute | MappedAddressAttribute;
 interface StunMessageInit {
   header: Header;
-  attrs: Attributes[];
+  attributes: Attributes[];
 }
 
-export function createStunMessage({ header, attrs }: StunMessageInit): Buffer {
-    const body = Buffer.concat([...attrs.map(i => i.toBuffer())]);
+export function createStunMessage({ header, attributes }: StunMessageInit): Buffer {
+    const body = Buffer.concat([...attributes.map(i => i.toBuffer())]);
     header.setLength(body.length);
 
     return Buffer.concat([header.toBuffer(), body]);
@@ -60,7 +60,7 @@ export function parseStunMessage(buffer: Buffer): StunMessageInit {
     }
   }
 
-  return { header, attrs: [...attrs.values()] };
+  return { header, attributes: [...attrs.values()] };
 }
 
 export function isStunMessage(msg: Buffer): boolean {

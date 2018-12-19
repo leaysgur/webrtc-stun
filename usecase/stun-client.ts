@@ -18,7 +18,8 @@ socket.on('message', (msg: Buffer) => {
   }
 
   const stunMsg = parseStunMessage(msg);
-  console.log(stunMsg);
+  console.log(stunMsg.header);
+  console.log(stunMsg.attributes);
   // switch (header.type) {
   //   case STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS:
   //     console.log('BINDING_RESPONSE_SUCCESS');
@@ -35,6 +36,6 @@ const header = new Header();
 header.setType(STUN_MESSAGE_TYPE.BINDING_REQUEST);
 const softwareAttr = new SoftwareAttribute('webrtc-stack-study');
 
-const packet = createStunMessage({ header, attrs: [softwareAttr] });
+const packet = createStunMessage({ header, attributes: [softwareAttr] });
 socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
 // socket.send(packet, 19302, 'stun.l.google.com');
