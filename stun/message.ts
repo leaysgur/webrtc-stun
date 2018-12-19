@@ -13,7 +13,7 @@ export class StunMessage {
     const body = buffer.slice(20, buffer.length);
 
     const header = Header.fromBuffer(head);
-    const attrs = [];
+    const attrs = new Map();
 
     let offset = 0;
     while (offset < body.length) {
@@ -30,24 +30,27 @@ export class StunMessage {
       const paddingByte = calcPaddingByte(length, 4);
       offset += paddingByte;
 
-      // TODO: skip duplicates
+      // skip duplicates
+      if (attrs.has(type)) {
+        continue;
+      }
 
       switch (type) {
         case STUN_ATTRIBUTE_TYPE.SOFTWARE:
-          attrs.push(SoftwareAttribute.fromBuffer(value));
+          attrs.set(type, SoftwareAttribute.fromBuffer(value));
           break;
         case STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS:
-          attrs.push(MappedAddressAttribute.fromBuffer(value));
+          attrs.set(type, MappedAddressAttribute.fromBuffer(value));
           break;
         case STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS:
-          attrs.push(XorMappedAddressAttribute.fromBuffer(value, header));
+          attrs.set(type, XorMappedAddressAttribute.fromBuffer(value, header));
           break;
         default:
           console.log(`STUN attr type 0x${type.toString(16)} is not defined yet.`);
       }
     }
 
-    return new StunMessage(header, attrs);
+    return new StunMessage(header, [...attrs.values()]);
   }
 
   constructor(private header: Header, private body: Attributes[]) {}
