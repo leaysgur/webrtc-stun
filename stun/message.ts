@@ -2,9 +2,10 @@ import { calcPaddingByte, numberToStringWithRadixAndPadding } from './utils';
 import { Header } from './header';
 import { SoftwareAttribute } from './attribute/software';
 import { XorMappedAddressAttribute } from './attribute/xor-mapped-address';
+import { MappedAddressAttribute } from './attribute/mapped-address';
 import { STUN_ATTRIBUTE_TYPE } from './attribute-type';
 
-type Attributes = SoftwareAttribute | XorMappedAddressAttribute;
+type Attributes = SoftwareAttribute | XorMappedAddressAttribute | MappedAddressAttribute;
 
 export class StunMessage {
   static fromBuffer(buffer: Buffer): StunMessage {
@@ -35,9 +36,14 @@ export class StunMessage {
         case STUN_ATTRIBUTE_TYPE.SOFTWARE:
           attrs.push(SoftwareAttribute.fromBuffer(value));
           break;
+        case STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS:
+          attrs.push(MappedAddressAttribute.fromBuffer(value));
+          break;
         case STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS:
           attrs.push(XorMappedAddressAttribute.fromBuffer(value, header));
           break;
+        default:
+          console.log(`STUN attr type 0x${type.toString(16)} is not defined yet.`);
       }
     }
 
