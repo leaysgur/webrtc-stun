@@ -58,22 +58,27 @@ export class Header {
   }
 
   setType(val: number | Buffer) {
-    const v = Buffer.isBuffer(val) ? val.readUInt16BE(0) : val;
-    this._type.writeUInt16BE(v, 0);
+    if (Buffer.isBuffer(val)) {
+      val.copy(this._type);
+    } else {
+      this._type.writeUInt16BE(val, 0);
+    }
   }
 
   setLength(val: number | Buffer) {
-    const v = Buffer.isBuffer(val) ? val.readUInt16BE(0) : val;
-    this._length.writeUInt16BE(v, 0);
+    if (Buffer.isBuffer(val)) {
+      val.copy(this._length);
+    } else {
+      this._length.writeUInt16BE(val, 0);
+    }
   }
 
-  setMagicCookie(val: number | Buffer) {
-    const v = Buffer.isBuffer(val) ? val.readUInt32BE(0) : val;
-    this._magicCookie.writeUInt32BE(v, 0);
+  setMagicCookie(val: Buffer) {
+    val.copy(this._magicCookie);
   }
 
   setTransactionId(val: Buffer) {
-    this._transactionId.write(val.toString(), 0);
+    val.copy(this._transactionId);
   }
 
   toBuffer(): Buffer {
