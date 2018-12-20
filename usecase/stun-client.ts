@@ -6,7 +6,7 @@ import {
   Header,
   SoftwareAttribute,
   STUN_MESSAGE_TYPE,
-} from '../stun';
+} from '../lib';
 
 const socket = dgram.createSocket({ type: 'udp4' });
 
