@@ -83,7 +83,8 @@ function ipV6BufferToString(buf: Buffer): string {
   for (let i = 0; i < buf.length; i += 2) {
     res.push(buf.readUInt16BE(i).toString(16));
   }
-  return res.join(':')
+  return res
+    .join(':')
     .replace(/(^|:)0(:0)*:0(:|$)/, '$1::$3')
     .replace(/:{3,4}/, '::');
 }

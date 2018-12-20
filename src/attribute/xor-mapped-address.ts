@@ -73,7 +73,10 @@ function parseIpV4(attr: Buffer, header: Header): string {
 function parseIpV6(attr: Buffer, header: Header): string {
   const xaddress = attr.slice(4, 20);
 
-  const xored = bufferXor(xaddress, Buffer.concat([header.magicCookie, header.transactionId]));
+  const xored = bufferXor(
+    xaddress,
+    Buffer.concat([header.magicCookie, header.transactionId]),
+  );
   return ipV6BufferToString(xored);
 }
 
@@ -90,7 +93,8 @@ function ipV6BufferToString(buf: Buffer): string {
   for (let i = 0; i < buf.length; i += 2) {
     res.push(buf.readUInt16BE(i).toString(16));
   }
-  return res.join(':')
+  return res
+    .join(':')
     .replace(/(^|:)0(:0)*:0(:|$)/, '$1::$3')
     .replace(/:{3,4}/, '::');
 }

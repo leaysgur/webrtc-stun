@@ -23,7 +23,8 @@ export function numberToStringWithRadixAndPadding(
  */
 export function calcPaddingByte(curByte: number, boundaryByte: number): number {
   const missingBoundaryByte = curByte % boundaryByte;
-  const paddingByte = missingBoundaryByte === 0 ? 0 : boundaryByte - missingBoundaryByte;
+  const paddingByte =
+    missingBoundaryByte === 0 ? 0 : boundaryByte - missingBoundaryByte;
   return paddingByte;
 }
 

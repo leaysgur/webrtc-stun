@@ -5,17 +5,23 @@ import { XorMappedAddressAttribute } from './attribute/xor-mapped-address';
 import { MappedAddressAttribute } from './attribute/mapped-address';
 import { STUN_ATTRIBUTE_TYPE } from './attribute-type';
 
-type Attributes = SoftwareAttribute | XorMappedAddressAttribute | MappedAddressAttribute;
+type Attributes =
+  | SoftwareAttribute
+  | XorMappedAddressAttribute
+  | MappedAddressAttribute;
 interface StunMessageInit {
   header: Header;
   attributes: Attributes[];
 }
 
-export function createStunMessage({ header, attributes }: StunMessageInit): Buffer {
-    const body = Buffer.concat([...attributes.map(i => i.toBuffer())]);
-    header.setLength(body.length);
+export function createStunMessage({
+  header,
+  attributes,
+}: StunMessageInit): Buffer {
+  const body = Buffer.concat([...attributes.map(i => i.toBuffer())]);
+  header.setLength(body.length);
 
-    return Buffer.concat([header.toBuffer(), body]);
+  return Buffer.concat([header.toBuffer(), body]);
 }
 
 export function parseStunMessage(buffer: Buffer): StunMessageInit {
@@ -56,7 +62,9 @@ export function parseStunMessage(buffer: Buffer): StunMessageInit {
         attrs.set(type, XorMappedAddressAttribute.fromBuffer(value, header));
         break;
       default:
-        console.log(`STUN attr type 0x${type.toString(16)} is not defined yet.`);
+        console.log(
+          `STUN attr type 0x${type.toString(16)} is not defined yet.`,
+        );
     }
   }
 
