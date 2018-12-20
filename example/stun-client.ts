@@ -32,10 +32,9 @@ socket.on('message', (msg: Buffer) => {
   socket.close();
 });
 
-const header = new Header();
-header.setType(STUN_MESSAGE_TYPE.BINDING_REQUEST);
+const header = new Header(STUN_MESSAGE_TYPE.BINDING_REQUEST);
 const softwareAttr = new SoftwareAttribute('webrtc-stack-study');
 
 const packet = createStunMessage({ header, attributes: [softwareAttr] });
-socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
-// socket.send(packet, 19302, 'stun.l.google.com');
+// socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
+socket.send(packet, 19302, 'stun.l.google.com');

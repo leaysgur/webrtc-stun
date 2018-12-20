@@ -19,9 +19,8 @@ export function createStunMessage({
   attributes,
 }: StunMessageInit): Buffer {
   const body = Buffer.concat([...attributes.map(i => i.toBuffer())]);
-  header.setLength(body.length);
 
-  return Buffer.concat([header.toBuffer(), body]);
+  return Buffer.concat([header.toBuffer(body.length), body]);
 }
 
 export function parseStunMessage(buffer: Buffer): StunMessageInit {

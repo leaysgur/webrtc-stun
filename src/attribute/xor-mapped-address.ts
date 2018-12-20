@@ -59,14 +59,14 @@ export class XorMappedAddressAttribute {
 function parsePort(attr: Buffer, header: Header): number {
   const xport = attr.slice(2, 4);
 
-  const xored = bufferXor(xport, header.magicCookie);
+  const xored = bufferXor(xport, header.getMagicCookieAsBuffer());
   return xored.readUInt16BE(0);
 }
 
 function parseIpV4(attr: Buffer, header: Header): string {
   const xaddress = attr.slice(4, 8);
 
-  const xored = bufferXor(xaddress, header.magicCookie);
+  const xored = bufferXor(xaddress, header.getMagicCookieAsBuffer());
   return ipV4BufferToString(xored);
 }
 
@@ -75,7 +75,10 @@ function parseIpV6(attr: Buffer, header: Header): string {
 
   const xored = bufferXor(
     xaddress,
-    Buffer.concat([header.magicCookie, header.transactionId]),
+    Buffer.concat([
+      header.getMagicCookieAsBuffer(),
+      header.getTransactionIdAsBuffer(),
+    ]),
   );
   return ipV6BufferToString(xored);
 }
