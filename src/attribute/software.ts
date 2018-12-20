@@ -2,8 +2,8 @@ import { STUN_ATTRIBUTE_TYPE } from '../attribute-type';
 import { calcPaddingByte } from '../utils';
 
 export class SoftwareAttribute {
-  static fromBuffer(buffer: Buffer): SoftwareAttribute {
-    const name = buffer.toString();
+  static fromBuffer(attr: Buffer): SoftwareAttribute {
+    const name = attr.toString();
     return new SoftwareAttribute(name);
   }
 
