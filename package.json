@@ -1,6 +1,6 @@
 {
-  "name": "webrtc-stack-study",
-  "version": "1.0.0",
+  "name": "webrtc-stun",
+  "version": "0.0.0",
   "description": "",
   "devDependencies": {
     "@types/node": "^10.12.12",
@@ -12,7 +12,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint -p . --fix && tsc -p . --noEmit"
   },
-  "keywords": [],
+  "keywords": ["webrtc", "nodejs", "stun"],
   "author": "leader22",
   "license": "MIT"
 }
