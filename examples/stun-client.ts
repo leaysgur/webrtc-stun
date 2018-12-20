@@ -1,12 +1,16 @@
 import * as dgram from 'dgram';
 import {
+  // STUN Message creator
   isStunMessage,
   createStunMessage,
   parseStunMessage,
+  // combine these to create STUN message
   Header,
   SoftwareAttribute,
+  XorMappedAddressAttribute,
+  // constants to process
   STUN_MESSAGE_TYPE,
-  // STUN_ATTRIBUTE_TYPE,
+  STUN_ATTRIBUTE_TYPE,
 } from '../src';
 
 const socket = dgram.createSocket({ type: 'udp4' });
@@ -22,12 +26,14 @@ socket.on('message', (msg: Buffer) => {
 
   switch (header.type) {
     case STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS:
-      console.log('BINDING_RESPONSE_SUCCESS');
-      console.log(body);
-      // const xorMappedAddress = body.getAttribute(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS);
-      // if (xorMappedAddress !== null) {
-      //   console.log(xorMappedAddress.toJSON());
-      // }
+      const xorMappedAddress = body.find(
+        i => i.type === STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS,
+      );
+
+      if (xorMappedAddress) {
+        const attr = xorMappedAddress as XorMappedAddressAttribute;
+        console.log(`Your IP is ${attr.payload.address}`);
+      }
       break;
     case STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR:
       console.log('BINDING_RESPONSE_ERROR');
