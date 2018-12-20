@@ -1,5 +1,12 @@
 import * as crypto from 'crypto';
 
+interface HeaderJSON {
+  type: number;
+  length: number;
+  magicCookie: number;
+  transactionId: string;
+}
+
 /*
  * STUN Message Header
  *
@@ -27,32 +34,41 @@ export class Header {
   }
 
   constructor(
-    private _type: number,
-    private _length: number = 0,
-    private _magicCookie: number = 0x2112a442,
-    private _transactionId: string = crypto.randomBytes(12).toString('hex'),
+    private type: number,
+    private length: number = 0,
+    private magicCookie: number = 0x2112a442,
+    private transactionId: string = crypto.randomBytes(12).toString('hex'),
   ) {}
 
   getMagicCookieAsBuffer(): Buffer {
     const magicCookie = Buffer.alloc(4);
-    magicCookie.writeInt32BE(this._magicCookie, 0);
+    magicCookie.writeInt32BE(this.magicCookie, 0);
 
     return magicCookie;
   }
 
   getTransactionIdAsBuffer(): Buffer {
     const transactionId = Buffer.alloc(12);
-    transactionId.write(this._transactionId, 0, 12, 'hex');
+    transactionId.write(this.transactionId, 0, 12, 'hex');
 
     return transactionId;
   }
 
+  toJSON(): HeaderJSON {
+    return {
+      type: this.type,
+      length: this.length,
+      magicCookie: this.magicCookie,
+      transactionId: this.transactionId,
+    };
+  }
+
   toBuffer(bodyLen: number): Buffer {
     const type = Buffer.alloc(2);
-    type.writeUInt16BE(this._type, 0);
+    type.writeUInt16BE(this.type, 0);
 
     const length = Buffer.alloc(2);
-    length.writeUInt16BE(bodyLen || this._length, 0);
+    length.writeUInt16BE(bodyLen || this.length, 0);
 
     return Buffer.concat([
       type,

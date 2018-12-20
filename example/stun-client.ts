@@ -18,16 +18,17 @@ socket.on('message', (msg: Buffer) => {
   }
 
   const stunMsg = parseStunMessage(msg);
-  console.log(stunMsg.header);
-  console.log(stunMsg.attributes);
-  // switch (header.type) {
-  //   case STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS:
-  //     console.log('BINDING_RESPONSE_SUCCESS');
-  //     break;
-  //   case STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR:
-  //     console.log('BINDING_RESPONSE_ERROR');
-  //     break;
-  // }
+
+  const { type } = stunMsg.header.toJSON();
+  switch (type) {
+    case STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS:
+      console.log('BINDING_RESPONSE_SUCCESS');
+      console.log(stunMsg.attributes);
+      break;
+    case STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR:
+      console.log('BINDING_RESPONSE_ERROR');
+      break;
+  }
 
   socket.close();
 });

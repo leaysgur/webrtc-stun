@@ -1,5 +1,11 @@
 import { STUN_ATTRIBUTE_TYPE } from '../attribute-type';
 
+interface MappedAddressAttributeJSON {
+  family: number;
+  port: number;
+  address: string;
+}
+
 /**
  * STUN MAPPED_ADDRESS Attribute
  *
@@ -31,21 +37,17 @@ export class MappedAddressAttribute {
   }
 
   constructor(
-    private _family: number,
-    private _port: number,
-    private _address: string,
+    private family: number,
+    private port: number,
+    private address: string,
   ) {}
 
-  get family(): number {
-    return this._family;
-  }
-
-  get port(): number {
-    return this._port;
-  }
-
-  get address(): string {
-    return this._address;
+  toJSON(): MappedAddressAttributeJSON {
+    return {
+      family: this.family,
+      port: this.port,
+      address: this.address,
+    };
   }
 
   toBuffer(): Buffer {
