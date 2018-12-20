@@ -4,9 +4,9 @@ import {
   createStunMessage,
   parseStunMessage,
   Header,
-  Body,
   SoftwareAttribute,
   STUN_MESSAGE_TYPE,
+  // STUN_ATTRIBUTE_TYPE,
 } from '../src';
 
 const socket = dgram.createSocket({ type: 'udp4' });
@@ -18,13 +18,16 @@ socket.on('message', (msg: Buffer) => {
     return;
   }
 
-  const stunMsg = parseStunMessage(msg);
+  const { header, body } = parseStunMessage(msg);
 
-  const { type } = stunMsg.header.toJSON();
-  switch (type) {
+  switch (header.type) {
     case STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS:
       console.log('BINDING_RESPONSE_SUCCESS');
-      console.log(stunMsg.body);
+      console.log(body);
+      // const xorMappedAddress = body.getAttribute(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS);
+      // if (xorMappedAddress !== null) {
+      //   console.log(xorMappedAddress.toJSON());
+      // }
       break;
     case STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR:
       console.log('BINDING_RESPONSE_ERROR');
@@ -34,9 +37,9 @@ socket.on('message', (msg: Buffer) => {
   socket.close();
 });
 
-const header = new Header(STUN_MESSAGE_TYPE.BINDING_REQUEST);
-const body = new Body([new SoftwareAttribute('webrtc-stack-study')]);
-
-const packet = createStunMessage({ header, body });
-// socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
-socket.send(packet, 19302, 'stun.l.google.com');
+const packet = createStunMessage({
+  header: new Header(STUN_MESSAGE_TYPE.BINDING_REQUEST),
+  body: [new SoftwareAttribute('webrtc-stack-study')],
+});
+socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
+// socket.send(packet, 19302, 'stun.l.google.com');

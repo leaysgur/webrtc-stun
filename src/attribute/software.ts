@@ -1,21 +1,15 @@
 import { STUN_ATTRIBUTE_TYPE } from '../attribute-type';
 import { calcPaddingByte } from '../utils';
 
-interface SoftwareAttributeJSON {
-  name: string;
-}
-
 export class SoftwareAttribute {
   static fromBuffer(attr: Buffer): SoftwareAttribute {
     const name = attr.toString();
     return new SoftwareAttribute(name);
   }
 
-  constructor(private name: string) {}
+  public type: number = STUN_ATTRIBUTE_TYPE.SOFTWARE;
 
-  toJSON(): SoftwareAttributeJSON {
-    return { name: this.name };
-  }
+  constructor(public name: string) {}
 
   toBuffer(): Buffer {
     // allocate dynamically for value

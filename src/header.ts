@@ -1,12 +1,5 @@
 import * as crypto from 'crypto';
 
-interface HeaderJSON {
-  type: number;
-  length: number;
-  magicCookie: number;
-  transactionId: string;
-}
-
 /*
  * STUN Message Header
  *
@@ -34,10 +27,10 @@ export class Header {
   }
 
   constructor(
-    private type: number,
-    private length: number = 0,
-    private magicCookie: number = 0x2112a442,
-    private transactionId: string = crypto.randomBytes(12).toString('hex'),
+    public type: number,
+    public length: number = 0,
+    public magicCookie: number = 0x2112a442,
+    public transactionId: string = crypto.randomBytes(12).toString('hex'),
   ) {}
 
   getMagicCookieAsBuffer(): Buffer {
@@ -52,15 +45,6 @@ export class Header {
     $transactionId.write(this.transactionId, 0, 12, 'hex');
 
     return $transactionId;
-  }
-
-  toJSON(): HeaderJSON {
-    return {
-      type: this.type,
-      length: this.length,
-      magicCookie: this.magicCookie,
-      transactionId: this.transactionId,
-    };
   }
 
   toBuffer(bodyLen: number): Buffer {

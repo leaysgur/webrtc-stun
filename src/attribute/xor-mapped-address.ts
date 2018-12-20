@@ -2,12 +2,6 @@ import { STUN_ATTRIBUTE_TYPE } from '../attribute-type';
 import { bufferXor } from '../utils';
 import { Header } from '../header';
 
-interface XorMappedAddressAttributeJSON {
-  family: number;
-  port: number;
-  address: string;
-}
-
 /**
  * STUN XOR_MAPPED_ADDRESS Attribute
  *
@@ -38,19 +32,13 @@ export class XorMappedAddressAttribute {
     return new XorMappedAddressAttribute(family, port, address);
   }
 
-  constructor(
-    private family: number,
-    private port: number,
-    private address: string,
-  ) {}
+  public type: number = STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS;
 
-  toJSON(): XorMappedAddressAttributeJSON {
-    return {
-      family: this.family,
-      port: this.port,
-      address: this.address,
-    };
-  }
+  constructor(
+    public family: number,
+    public port: number,
+    public address: string,
+  ) {}
 
   toBuffer(): Buffer {
     // TODO: impl
