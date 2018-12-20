@@ -7,13 +7,19 @@ export class SoftwareAttribute {
     return new SoftwareAttribute(name);
   }
 
-  public type: number = STUN_ATTRIBUTE_TYPE.SOFTWARE;
+  public type: number;
+  public payload: {
+    name: string;
+  };
 
-  constructor(public name: string) {}
+  constructor(name: string) {
+    this.type = STUN_ATTRIBUTE_TYPE.SOFTWARE;
+    this.payload = { name };
+  }
 
   toBuffer(): Buffer {
     // allocate dynamically for value
-    const value = Buffer.from(this.name);
+    const value = Buffer.from(this.payload.name);
 
     // 2byte(16bit) for type
     const type = Buffer.alloc(2);

@@ -30,13 +30,21 @@ export class MappedAddressAttribute {
     return new MappedAddressAttribute(family, port, address);
   }
 
-  public type: number = STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS;
+  public type: number;
+  public payload: {
+    family: number;
+    port: number;
+    address: string;
+  };
 
-  constructor(
-    public family: number,
-    public port: number,
-    public address: string,
-  ) {}
+  constructor(family: number, port: number, address: string) {
+    this.type = STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS;
+    this.payload = {
+      family,
+      port,
+      address,
+    };
+  }
 
   toBuffer(): Buffer {
     // TODO: impl
