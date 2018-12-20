@@ -23,7 +23,7 @@ export class SoftwareAttribute {
 
     // 2byte(16bit) for type
     const type = Buffer.alloc(2);
-    type.writeUInt16BE(STUN_ATTRIBUTE_TYPE.SOFTWARE, 0);
+    type.writeUInt16BE(this.type, 0);
 
     // 2byte(16bit) for length
     const length = Buffer.alloc(2);

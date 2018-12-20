@@ -47,11 +47,6 @@ export class XorMappedAddressAttribute {
       address,
     };
   }
-
-  toBuffer(): Buffer {
-    // TODO: impl
-    return Buffer.from([STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS]);
-  }
 }
 
 function parsePort(attr: Buffer, header: Header): number {

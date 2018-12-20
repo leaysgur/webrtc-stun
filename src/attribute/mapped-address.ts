@@ -45,11 +45,6 @@ export class MappedAddressAttribute {
       address,
     };
   }
-
-  toBuffer(): Buffer {
-    // TODO: impl
-    return Buffer.from([STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS]);
-  }
 }
 
 function parsePort(attr: Buffer): number {
