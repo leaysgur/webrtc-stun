@@ -24,11 +24,11 @@ interface HeaderJSON {
  *
  */
 export class Header {
-  static fromBuffer(buffer: Buffer): Header {
-    const type = buffer.readUInt16BE(0);
-    const length = buffer.readUInt16BE(2);
-    const magicCookie = buffer.readUInt32BE(4);
-    const transactionId = buffer.slice(8, 20).toString('hex');
+  static fromBuffer($header: Buffer): Header {
+    const type = $header.readUInt16BE(0);
+    const length = $header.readUInt16BE(2);
+    const magicCookie = $header.readUInt32BE(4);
+    const transactionId = $header.slice(8, 20).toString('hex');
 
     return new Header(type, length, magicCookie, transactionId);
   }
@@ -41,17 +41,17 @@ export class Header {
   ) {}
 
   getMagicCookieAsBuffer(): Buffer {
-    const magicCookie = Buffer.alloc(4);
-    magicCookie.writeInt32BE(this.magicCookie, 0);
+    const $magicCookie = Buffer.alloc(4);
+    $magicCookie.writeInt32BE(this.magicCookie, 0);
 
-    return magicCookie;
+    return $magicCookie;
   }
 
   getTransactionIdAsBuffer(): Buffer {
-    const transactionId = Buffer.alloc(12);
-    transactionId.write(this.transactionId, 0, 12, 'hex');
+    const $transactionId = Buffer.alloc(12);
+    $transactionId.write(this.transactionId, 0, 12, 'hex');
 
-    return transactionId;
+    return $transactionId;
   }
 
   toJSON(): HeaderJSON {
@@ -64,15 +64,15 @@ export class Header {
   }
 
   toBuffer(bodyLen: number): Buffer {
-    const type = Buffer.alloc(2);
-    type.writeUInt16BE(this.type, 0);
+    const $type = Buffer.alloc(2);
+    $type.writeUInt16BE(this.type, 0);
 
-    const length = Buffer.alloc(2);
-    length.writeUInt16BE(bodyLen || this.length, 0);
+    const $length = Buffer.alloc(2);
+    $length.writeUInt16BE(bodyLen || this.length, 0);
 
     return Buffer.concat([
-      type,
-      length,
+      $type,
+      $length,
       this.getMagicCookieAsBuffer(),
       this.getTransactionIdAsBuffer(),
     ]);

@@ -4,6 +4,7 @@ import {
   createStunMessage,
   parseStunMessage,
   Header,
+  Body,
   SoftwareAttribute,
   STUN_MESSAGE_TYPE,
 } from '../src';
@@ -23,7 +24,7 @@ socket.on('message', (msg: Buffer) => {
   switch (type) {
     case STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS:
       console.log('BINDING_RESPONSE_SUCCESS');
-      console.log(stunMsg.attributes);
+      console.log(stunMsg.body);
       break;
     case STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR:
       console.log('BINDING_RESPONSE_ERROR');
@@ -34,8 +35,8 @@ socket.on('message', (msg: Buffer) => {
 });
 
 const header = new Header(STUN_MESSAGE_TYPE.BINDING_REQUEST);
-const softwareAttr = new SoftwareAttribute('webrtc-stack-study');
+const body = new Body([new SoftwareAttribute('webrtc-stack-study')]);
 
-const packet = createStunMessage({ header, attributes: [softwareAttr] });
+const packet = createStunMessage({ header, body });
 // socket.send(packet, 3478, 'stun.webrtc.ecl.ntt.com');
 socket.send(packet, 19302, 'stun.l.google.com');
