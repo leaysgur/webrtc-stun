@@ -1,7 +1,12 @@
 {
   "name": "webrtc-stun",
   "version": "0.0.0",
-  "description": "",
+  "description": "Pure JavaScript STUN implementation for only WebRTC related part.",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "LICENSE"
+  ],
   "devDependencies": {
     "@types/node": "^10.12.12",
     "ts-node": "^7.0.1",
