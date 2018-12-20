@@ -11,8 +11,8 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "./usecase",
-    "./stun"
+    "./example",
+    "./src"
   ],
   "exclude": [
     "./node_modules"
