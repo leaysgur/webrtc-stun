@@ -17,7 +17,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "tslint -p . --fix && tsc -p . --noEmit"
+    "lint": "tslint -p . --fix && tsc -p . --noEmit",
+    "build": "tsc -p ."
   },
   "keywords": [
     "webrtc",

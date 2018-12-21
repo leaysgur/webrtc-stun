@@ -1,5 +1,5 @@
-import * as dgram from 'dgram';
-import {
+const dgram = require('dgram');
+const {
   // STUN Message creator
   isStunMessage,
   createStunMessage,
@@ -11,11 +11,11 @@ import {
   // constants to process
   STUN_MESSAGE_TYPE,
   STUN_ATTRIBUTE_TYPE,
-} from '../src';
+} = require('..');
 
 const socket = dgram.createSocket({ type: 'udp4' });
 
-socket.on('message', (msg: Buffer) => {
+socket.on('message', msg => {
   // ignore non-related packets
   if (!isStunMessage(msg)) {
     console.log('not a stun packet', msg.toString('hex'));
@@ -30,7 +30,7 @@ socket.on('message', (msg: Buffer) => {
     );
 
     if (xorMappedAddress) {
-      const attr = xorMappedAddress as XorMappedAddressAttribute;
+      const attr = xorMappedAddress; // as XorMappedAddressAttribute;
       console.log(`Your IP is ${attr.payload.address}`);
     }
   }

@@ -2,16 +2,17 @@
   "compilerOptions": {
     "target": "esnext",
     "moduleResolution": "node",
-    "noEmit": true,
-    "strict": true,
+    "module": "commonjs",
+    "outDir": "./lib",
+    "removeComments": true,
     "resolveJsonModule": true,
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "./examples",
     "./src"
   ],
   "exclude": [
