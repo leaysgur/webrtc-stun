@@ -45,6 +45,10 @@ export class MappedAddressAttribute {
       address,
     };
   }
+
+  toBuffer(): Buffer {
+    return Buffer.alloc(0);
+  }
 }
 
 function parsePort(attr: Buffer): number {

@@ -47,6 +47,10 @@ export class XorMappedAddressAttribute {
       address,
     };
   }
+
+  toBuffer(): Buffer {
+    return Buffer.alloc(0);
+  }
 }
 
 function parsePort(attr: Buffer, header: Header): number {
