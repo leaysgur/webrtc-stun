@@ -1,5 +1,6 @@
 import { STUN_ATTRIBUTE_TYPE } from '../attribute-type';
 import { calcPaddingByte } from '../utils';
+import { Header } from '../header';
 
 export class SoftwareAttribute {
   static fromBuffer(attr: Buffer): SoftwareAttribute {
@@ -17,7 +18,7 @@ export class SoftwareAttribute {
     this.payload = { name };
   }
 
-  toBuffer(): Buffer {
+  toBuffer(_header: Header): Buffer {
     // allocate dynamically for value
     const value = Buffer.from(this.payload.name);
 

@@ -16,7 +16,7 @@ interface StunMessage {
 }
 
 export function createStunMessage(msgInit: StunMessage): Buffer {
-  const $body = Buffer.concat([...msgInit.body.map(i => i.toBuffer())]);
+  const $body = Buffer.concat([...msgInit.body.map(i => i.toBuffer(msgInit.header))]);
   const $header = msgInit.header.toBuffer($body.length);
 
   return Buffer.concat([$header, $body]);

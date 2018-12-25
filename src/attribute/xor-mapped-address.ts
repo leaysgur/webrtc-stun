@@ -1,5 +1,5 @@
 import { STUN_ATTRIBUTE_TYPE } from '../attribute-type';
-import { bufferXor } from '../utils';
+import { bufferXor, calcPaddingByte } from '../utils';
 import { Header } from '../header';
 
 /**
@@ -48,8 +48,23 @@ export class XorMappedAddressAttribute {
     };
   }
 
-  toBuffer(): Buffer {
-    return Buffer.alloc(0);
+  // TODO: check IPv4 or IPv6
+  toBuffer(header: Header): Buffer {
+    const family = Buffer.alloc(2);
+    family.writeUInt16BE(this.payload.family === 4 ? 0x01 : 0x02, 0);
+
+    const port = Buffer.alloc(2);
+    port.writeUInt16BE(this.payload.port, 0);
+    const xport = bufferXor(port, header.getMagicCookieAsBuffer());
+
+    const address = Buffer.from(this.payload.address.split('.'));
+    const xaddress = bufferXor(address, header.getMagicCookieAsBuffer());
+
+    const value = Buffer.concat([family, xport, xaddress]);
+    const paddingByte = calcPaddingByte(value.length, 4);
+    const padding = Buffer.alloc(paddingByte);
+
+    return Buffer.concat([value, padding]);
   }
 }
 

@@ -33,6 +33,10 @@ export class Header {
     public transactionId: string = crypto.randomBytes(12).toString('hex'),
   ) {}
 
+  setTransactionId(transactionId: string) {
+    this.transactionId = transactionId;
+  }
+
   getMagicCookieAsBuffer(): Buffer {
     const $magicCookie = Buffer.alloc(4);
     $magicCookie.writeInt32BE(this.magicCookie, 0);
