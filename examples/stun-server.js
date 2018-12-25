@@ -16,23 +16,22 @@ const socket = dgram.createSocket({ type: 'udp4' });
 
 socket.on('message', (msg, rinfo) => {
   if (!isStunMessage(msg)) {
+    console.log(msg);
     return;
   }
 
-  const { header, body } = parseStunMessage(msg);
+  const req = parseStunMessage(msg);
 
-  if (header.type === STUN_MESSAGE_TYPE.BINDING_REQUEST) {
-    // TODO: create BINDING_RESPONSE_SUCCESS w/ XOR_MAPPED_ADDRESS
+  if (req.header.type === STUN_MESSAGE_TYPE.BINDING_REQUEST) {
+    const header = new Header(STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS);
+    header.setTransactionId(req.header.transactionId);
     const packet = createStunMessage({
-      header: new Header(STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS),
-      body: [],
+      header,
+      body: [new XorMappedAddressAttribute(4, rinfo.port, rinfo.address)],
     });
-    socket.send(packet, rinfo.port, rinfo.address);
-  } else {
-    console.log(header.type);
-    console.log(body);
-  }
 
+    socket.send(packet, rinfo.port, rinfo.address);
+  }
 });
 
 socket.bind(55555);
