@@ -1,0 +1,41 @@
+import { numberToStringWithRadixAndPadding, calcMessageType } from './utils';
+
+const MESSAGE_METHOD = {
+  BINDING: 0b000000000001,
+};
+
+const MESSAGE_CLASS = {
+  REQUEST: 0b00,
+  // INDICATION: 0b01,
+  RESPONSE_SUCCESS: 0b10,
+  RESPONSE_ERROR: 0b11,
+};
+
+export const STUN_MESSAGE_TYPE = {
+  BINDING_REQUEST: calcMessageType(
+    MESSAGE_METHOD.BINDING,
+    MESSAGE_CLASS.REQUEST,
+  ),
+  // const BINDING_INDICATION: calcMessageType(MESSAGE_METHOD.BINDING, MESSAGE_CLASS.INDICATION),
+  BINDING_RESPONSE_SUCCESS: calcMessageType(
+    MESSAGE_METHOD.BINDING,
+    MESSAGE_CLASS.RESPONSE_SUCCESS,
+  ),
+  BINDING_RESPONSE_ERROR: calcMessageType(
+    MESSAGE_METHOD.BINDING,
+    MESSAGE_CLASS.RESPONSE_ERROR,
+  ),
+};
+
+export const STUN_ATTRIBUTE_TYPE = {
+  // RFC 5389 Required types
+  MAPPED_ADDRESS: 0x0001,
+  XOR_MAPPED_ADDRESS: 0x0020,
+
+  // RFC 5389 Optional types
+  SOFTWARE: 0x8022,
+  FINGERPRINT: 0x8028,
+
+  // RFC 5780 Optional types
+  RESPONSE_ORIGIN: 0x802b,
+};

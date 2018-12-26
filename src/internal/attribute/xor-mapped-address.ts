@@ -15,56 +15,58 @@ import { Header } from '../header';
  *
  */
 export class XorMappedAddressAttribute {
-  static fromBuffer(attr: Buffer, header: Header): XorMappedAddressAttribute {
-    const familyVal = attr.readUInt16BE(0);
-    const family = {
-      [`${0x01}`]: 4,
-      [`${0x02}`]: 6,
-    }[familyVal];
-
-    const port = parsePort(attr, header);
-
-    const address = {
-      [`${0x01}`]: parseIpV4(attr, header),
-      [`${0x02}`]: parseIpV6(attr, header),
-    }[familyVal];
-
-    return new XorMappedAddressAttribute(family, port, address);
+  static create(): XorMappedAddressAttribute {
+    return new XorMappedAddressAttribute('', 0, '');
   }
 
-  public type: number;
-  public payload: {
-    family: number;
-    port: number;
-    address: string;
-  };
-
-  constructor(family: number, port: number, address: string) {
-    this.type = STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS;
-    this.payload = {
-      family,
-      port,
-      address,
-    };
-  }
+  constructor(
+    private family: string,
+    private port: number,
+    private address: string,
+  ) {}
 
   // TODO: check IPv4 or IPv6
   toBuffer(header: Header): Buffer {
     const family = Buffer.alloc(2);
-    family.writeUInt16BE(this.payload.family === 4 ? 0x01 : 0x02, 0);
+    family.writeUInt16BE(this.family === 'IPv4' ? 0x01 : 0x02, 0);
 
     const port = Buffer.alloc(2);
-    port.writeUInt16BE(this.payload.port, 0);
+    port.writeUInt16BE(this.port, 0);
     const xport = bufferXor(port, header.getMagicCookieAsBuffer());
 
-    const address = Buffer.from(this.payload.address.split('.'));
+    const address = Buffer.from(this.address.split('.'));
     const xaddress = bufferXor(address, header.getMagicCookieAsBuffer());
 
     const value = Buffer.concat([family, xport, xaddress]);
     const paddingByte = calcPaddingByte(value.length, 4);
     const padding = Buffer.alloc(paddingByte);
 
-    return Buffer.concat([value, padding]);
+    // 2byte(16bit) for type
+    const type = Buffer.alloc(2);
+    type.writeUInt16BE(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS, 0);
+
+    // 2byte(16bit) for length
+    const length = Buffer.alloc(2);
+    length.writeUInt16BE(value.length, 0);
+
+    return Buffer.concat([type, length, value, padding]);
+  }
+
+  loadBuffer(attr: Buffer, header: Header): boolean {
+    const familyVal = attr.readUInt16BE(0);
+    this.family = {
+      [`${0x01}`]: 'IPv4',
+      [`${0x02}`]: 'IPv6',
+    }[familyVal];
+
+    this.port = parsePort(attr, header);
+
+    this.address = {
+      [`${0x01}`]: parseIpV4(attr, header),
+      [`${0x02}`]: parseIpV6(attr, header),
+    }[familyVal];
+
+    return true;
   }
 }
 

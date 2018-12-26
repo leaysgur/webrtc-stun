@@ -17,46 +17,41 @@ import * as crypto from 'crypto';
  *
  */
 export class Header {
-  static fromBuffer($header: Buffer): Header {
-    const type = $header.readUInt16BE(0);
-    const length = $header.readUInt16BE(2);
-    const magicCookie = $header.readUInt32BE(4);
-    const transactionId = $header.slice(8, 20).toString('hex');
-
-    return new Header(type, length, magicCookie, transactionId);
-  }
-
   constructor(
-    public type: number,
-    public length: number = 0,
-    public magicCookie: number = 0x2112a442,
-    public transactionId: string = crypto.randomBytes(12).toString('hex'),
+    private _type: number = 0,
+    private _length: number = 0,
+    private _magicCookie: number = 0x2112a442,
+    private _transactionId: string = crypto.randomBytes(12).toString('hex'),
   ) {}
 
-  setTransactionId(transactionId: string) {
-    this.transactionId = transactionId;
+  get type(): number {
+    return this._type;
+  }
+  // TODO: いる？constructor()でいいのでは？
+  set type(type: number) {
+    this._type = type;
   }
 
   getMagicCookieAsBuffer(): Buffer {
     const $magicCookie = Buffer.alloc(4);
-    $magicCookie.writeInt32BE(this.magicCookie, 0);
+    $magicCookie.writeInt32BE(this._magicCookie, 0);
 
     return $magicCookie;
   }
 
   getTransactionIdAsBuffer(): Buffer {
     const $transactionId = Buffer.alloc(12);
-    $transactionId.write(this.transactionId, 0, 12, 'hex');
+    $transactionId.write(this._transactionId, 0, 12, 'hex');
 
     return $transactionId;
   }
 
   toBuffer(bodyLen: number): Buffer {
     const $type = Buffer.alloc(2);
-    $type.writeUInt16BE(this.type, 0);
+    $type.writeUInt16BE(this._type, 0);
 
     const $length = Buffer.alloc(2);
-    $length.writeUInt16BE(bodyLen || this.length, 0);
+    $length.writeUInt16BE(bodyLen || this._length, 0);
 
     return Buffer.concat([
       $type,
@@ -64,5 +59,20 @@ export class Header {
       this.getMagicCookieAsBuffer(),
       this.getTransactionIdAsBuffer(),
     ]);
+  }
+
+  loadBuffer($header: Buffer): boolean {
+    this._type = $header.readUInt16BE(0);
+    this._length = $header.readUInt16BE(2);
+    this._magicCookie = $header.readUInt32BE(4);
+    this._transactionId = $header.slice(8, 20).toString('hex');
+
+    // TODO: check type(cls, mtd)
+
+    if (this._magicCookie !== 0x2112a442) {
+      return false;
+    }
+
+    return true;
   }
 }

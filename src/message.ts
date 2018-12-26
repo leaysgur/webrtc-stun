@@ -1,78 +1,122 @@
-import { calcPaddingByte, numberToStringWithRadixAndPadding } from './utils';
-import { Header } from './header';
-import { SoftwareAttribute } from './attribute/software';
-import { XorMappedAddressAttribute } from './attribute/xor-mapped-address';
-import { MappedAddressAttribute } from './attribute/mapped-address';
-import { STUN_ATTRIBUTE_TYPE } from './attribute-type';
+import {
+  calcPaddingByte,
+  numberToStringWithRadixAndPadding,
+} from './internal/utils';
+import { Header } from './internal/header';
+import { SoftwareAttribute } from './internal/attribute/software';
+import { XorMappedAddressAttribute } from './internal/attribute/xor-mapped-address';
+import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './internal/constants';
 
-type Attributes =
-  | SoftwareAttribute
-  | XorMappedAddressAttribute
-  | MappedAddressAttribute;
+type Attribute = SoftwareAttribute | XorMappedAddressAttribute;
 
-interface StunMessage {
-  header: Header;
-  body: Attributes[];
-}
+export class StunMessage {
+  constructor(
+    private header: Header = new Header(),
+    private attributes: Map<number, Attribute> = new Map(),
+  ) {}
 
-export function createStunMessage(msgInit: StunMessage): Buffer {
-  const $body = Buffer.concat([...msgInit.body.map(i => i.toBuffer(msgInit.header))]);
-  const $header = msgInit.header.toBuffer($body.length);
+  isBindingResponseSuccess(): boolean {
+    return this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS;
+  }
 
-  return Buffer.concat([$header, $body]);
-}
+  setBindingRequestType(): StunMessage {
+    this.header.type = STUN_MESSAGE_TYPE.BINDING_REQUEST;
 
-export function parseStunMessage($buffer: Buffer): StunMessage {
-  const $header = $buffer.slice(0, 20);
-  const $body = $buffer.slice(20, $buffer.length);
+    return this;
+  }
 
-  const header = Header.fromBuffer($header);
-  const attrs = new Map<number, Attributes>();
+  setSoftwareAttribute(name: string): StunMessage {
+    this.attributes.set(
+      STUN_ATTRIBUTE_TYPE.SOFTWARE,
+      new SoftwareAttribute(name),
+    );
 
-  let offset = 0;
-  while (offset < $body.length) {
-    const type = $body.readUInt16BE(offset);
-    offset += 2; // 16bit = 2byte
+    return this;
+  }
 
-    const length = $body.readUInt16BE(offset);
-    offset += 2; // 16bit = 2byte
+  getXorMappedAddressAttribute(): XorMappedAddressAttribute | null {
+    const attr = this.attributes.get(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS);
 
-    const $value = $body.slice(offset, offset + length);
-    offset += $value.length;
+    return attr instanceof XorMappedAddressAttribute ? attr : null;
+  }
 
-    // STUN Attribute must be in 32bit(= 4byte) boundary
-    const paddingByte = calcPaddingByte(length, 4);
-    offset += paddingByte;
+  toBuffer(): Buffer {
+    const $body = Buffer.concat(
+      [...this.attributes.values()].map(i => i.toBuffer(this.header)),
+    );
+    const $header = this.header.toBuffer($body.length);
 
-    // skip duplicates
-    if (attrs.has(type)) {
-      continue;
+    return Buffer.concat([$header, $body]);
+  }
+
+  loadBuffer($buffer: Buffer): boolean {
+    if (!this.isFirst2BitZero($buffer)) {
+      return false;
     }
 
-    switch (type) {
-      case STUN_ATTRIBUTE_TYPE.SOFTWARE:
-        attrs.set(type, SoftwareAttribute.fromBuffer($value));
-        break;
-      case STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS:
-        attrs.set(type, MappedAddressAttribute.fromBuffer($value));
-        break;
-      case STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS:
-        attrs.set(type, XorMappedAddressAttribute.fromBuffer($value, header));
-        break;
-      default:
+    const $header = $buffer.slice(0, 20);
+    const $body = $buffer.slice(20, $buffer.length);
+
+    // load header
+    if (!this.header.loadBuffer($header)) {
+      return false;
+    }
+
+    // load attributes
+    let offset = 0;
+    while (offset < $body.length) {
+      const type = $body.readUInt16BE(offset);
+      offset += 2; // 16bit = 2byte
+
+      const length = $body.readUInt16BE(offset);
+      offset += 2; // 16bit = 2byte
+
+      const $value = $body.slice(offset, offset + length);
+      offset += $value.length;
+
+      // STUN Attribute must be in 32bit(= 4byte) boundary
+      const paddingByte = calcPaddingByte(length, 4);
+      offset += paddingByte;
+
+      // skip duplicates
+      if (this.attributes.has(type)) {
+        continue;
+      }
+
+      const attr = this.getAttrByType(type);
+      // skip not supported
+      if (attr === null) {
         console.log(
           `STUN attr type 0x${type.toString(16)} is not supported yet.`,
         );
+        continue;
+      }
+
+      // if attr has invalid value
+      if (!attr.loadBuffer($value, this.header)) {
+        return false;
+      }
+
+      this.attributes.set(type, attr);
     }
+
+    return true;
   }
 
-  return { header, body: [...attrs.values()] };
-}
+  private isFirst2BitZero($buffer: Buffer): boolean {
+    // 8bit is enough to know first and second bit
+    const first1byte = $buffer.readUInt8(0);
+    const first8bit = numberToStringWithRadixAndPadding(first1byte, 2, 8);
 
-export function isStunMessage(msg: Buffer): boolean {
-  // 8bit is enough to know first and second bit
-  const first1byte = msg.readUInt8(0);
-  const first8bit = numberToStringWithRadixAndPadding(first1byte, 2, 8);
+    return first8bit.slice(0, 2) === '00';
+  }
 
-  return first8bit.charAt(0) === '0' && first8bit.charAt(1) === '0';
+  private getAttrByType(type: number): Attribute | null {
+    const Attr = {
+      [`${STUN_ATTRIBUTE_TYPE.SOFTWARE}`]: SoftwareAttribute,
+      [`${STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS}`]: XorMappedAddressAttribute,
+    }[type];
+
+    return Attr ? Attr.create() : null;
+  }
 }

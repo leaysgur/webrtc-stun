@@ -3,28 +3,19 @@ import { calcPaddingByte } from '../utils';
 import { Header } from '../header';
 
 export class SoftwareAttribute {
-  static fromBuffer(attr: Buffer): SoftwareAttribute {
-    const name = attr.toString();
-    return new SoftwareAttribute(name);
+  static create(): SoftwareAttribute {
+    return new SoftwareAttribute('');
   }
 
-  public type: number;
-  public payload: {
-    name: string;
-  };
-
-  constructor(name: string) {
-    this.type = STUN_ATTRIBUTE_TYPE.SOFTWARE;
-    this.payload = { name };
-  }
+  constructor(private name: string) {}
 
   toBuffer(_header: Header): Buffer {
     // allocate dynamically for value
-    const value = Buffer.from(this.payload.name);
+    const value = Buffer.from(this.name);
 
     // 2byte(16bit) for type
     const type = Buffer.alloc(2);
-    type.writeUInt16BE(this.type, 0);
+    type.writeUInt16BE(STUN_ATTRIBUTE_TYPE.SOFTWARE, 0);
 
     // 2byte(16bit) for length
     const length = Buffer.alloc(2);
@@ -36,5 +27,11 @@ export class SoftwareAttribute {
     const padding = Buffer.alloc(paddingByte);
 
     return Buffer.concat([type, length, value, padding]);
+  }
+
+  loadBuffer(attr: Buffer): boolean {
+    this.name = attr.toString();
+
+    return true;
   }
 }
