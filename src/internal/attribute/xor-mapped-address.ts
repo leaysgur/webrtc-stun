@@ -23,7 +23,7 @@ import { Header } from '../header';
  */
 export class XorMappedAddressAttribute {
   static createBlank(): XorMappedAddressAttribute {
-    return new XorMappedAddressAttribute('', 0, '');
+    return new XorMappedAddressAttribute('', -1, '');
   }
 
   constructor(
