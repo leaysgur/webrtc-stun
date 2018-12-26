@@ -12,8 +12,10 @@ socket.on('message', (msg, rinfo) => {
   if (req.loadBuffer(msg)) {
     // true if STUN message has BINDING_REQUEST as its type
     if (req.isBindingRequest()) {
+      console.log('REQUEST', req);
       const res = req.createBindingResponse(true)
         .setXorMappedAddressAttribute(rinfo);
+      console.log('RESPONSE', res);
       socket.send(res.toBuffer(), rinfo.port, rinfo.address);
     }
   }
