@@ -79,7 +79,7 @@ export function calcPaddingByte(curByte: number, boundaryByte: number): number {
 }
 
 export function bufferXor(a: Buffer, b: Buffer): Buffer {
-  const length = Math.max(a.length, b.length);
+  const length = a.length;
   const buffer = Buffer.allocUnsafe(length);
 
   for (let i = 0; i < length; i++) {

@@ -62,13 +62,16 @@ export class XorMappedAddressAttribute {
 
   private decodePort($attr: Buffer, header: Header): number {
     const $xport = $attr.slice(2, 4);
-    const $port = bufferXor($xport, header.getMagicCookieAsBuffer());
+    const $port = bufferXor(
+      $xport,
+      header.getMagicCookieAsBuffer().slice(0, 2),
+    );
     return $port.readUInt16BE(0);
   }
   private encodePort(port: number, header: Header): Buffer {
     const $port = Buffer.alloc(2);
     $port.writeUInt16BE(port, 0);
-    return bufferXor($port, header.getMagicCookieAsBuffer());
+    return bufferXor($port, header.getMagicCookieAsBuffer().slice(0, 2));
   }
 
   private decodeIpV4($attr: Buffer, header: Header): string {
