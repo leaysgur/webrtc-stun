@@ -5,7 +5,7 @@ const { StunMessage } = require('..');
 const socket = dgram.createSocket({ type: 'udp4' });
 
 socket.on('message', msg => {
-  const res = StunMessage.create();
+  const res = StunMessage.createBlank();
 
   // true if msg is valid STUN message
   if (res.loadBuffer(msg)) {

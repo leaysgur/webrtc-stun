@@ -1,4 +1,4 @@
-import { STUN_ATTRIBUTE_TYPE } from '../attribute-type';
+import { STUN_ATTRIBUTE_TYPE } from '../constants';
 import { bufferXor, calcPaddingByte } from '../utils';
 import { Header } from '../header';
 
@@ -15,7 +15,7 @@ import { Header } from '../header';
  *
  */
 export class XorMappedAddressAttribute {
-  static create(): XorMappedAddressAttribute {
+  static createBlank(): XorMappedAddressAttribute {
     return new XorMappedAddressAttribute('', 0, '');
   }
 

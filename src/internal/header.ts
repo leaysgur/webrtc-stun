@@ -48,12 +48,12 @@ export class Header {
     return $transactionId;
   }
 
-  toBuffer(bodyLen: number): Buffer {
+  toBuffer(bodyLen: number = this._length): Buffer {
     const $type = Buffer.alloc(2);
     $type.writeUInt16BE(this._type, 0);
 
     const $length = Buffer.alloc(2);
-    $length.writeUInt16BE(bodyLen || this._length, 0);
+    $length.writeUInt16BE(bodyLen, 0);
 
     return Buffer.concat([
       $type,

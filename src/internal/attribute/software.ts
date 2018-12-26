@@ -1,9 +1,9 @@
-import { STUN_ATTRIBUTE_TYPE } from '../attribute-type';
+import { STUN_ATTRIBUTE_TYPE } from '../constants';
 import { calcPaddingByte } from '../utils';
 import { Header } from '../header';
 
 export class SoftwareAttribute {
-  static create(): SoftwareAttribute {
+  static createBlank(): SoftwareAttribute {
     return new SoftwareAttribute('');
   }
 

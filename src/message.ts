@@ -12,8 +12,8 @@ import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './internal/constants';
 type Attribute = SoftwareAttribute | XorMappedAddressAttribute;
 
 export class StunMessage {
-  static create(): StunMessage {
-    return new StunMessage(new Header(0, generateTransactionId()));
+  static createBlank(): StunMessage {
+    return new StunMessage(new Header(-1, generateTransactionId()));
   }
   static createBindingRequest(): StunMessage {
     return new StunMessage(
@@ -143,6 +143,6 @@ export class StunMessage {
       [`${STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS}`]: XorMappedAddressAttribute,
     }[type];
 
-    return Attr ? Attr.create() : null;
+    return Attr ? Attr.createBlank() : null;
   }
 }
