@@ -1,36 +1,21 @@
 const dgram = require('dgram');
 const {
-  // STUN Message creator
-  isStunMessage,
-  createStunMessage,
-  parseStunMessage,
-  // combine these to create STUN message
-  Header,
-  XorMappedAddressAttribute,
-  // constants to process
-  STUN_MESSAGE_TYPE,
-  STUN_ATTRIBUTE_TYPE,
+  StunMessage,
 } = require('..');
 
 const socket = dgram.createSocket({ type: 'udp4' });
 
 socket.on('message', (msg, rinfo) => {
-  if (!isStunMessage(msg)) {
-    console.log(msg);
-    return;
-  }
+  const req = StunMessage.create();
 
-  const req = parseStunMessage(msg);
-
-  if (req.header.type === STUN_MESSAGE_TYPE.BINDING_REQUEST) {
-    const header = new Header(STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS);
-    header.setTransactionId(req.header.transactionId);
-    const packet = createStunMessage({
-      header,
-      body: [new XorMappedAddressAttribute(4, rinfo.port, rinfo.address)],
-    });
-
-    socket.send(packet, rinfo.port, rinfo.address);
+  // true if msg is valid STUN message
+  if (req.loadBuffer(msg)) {
+    // true if STUN message has BINDING_REQUEST as its type
+    if (req.isBindingRequest()) {
+      const res = req.createBindingResponse(true)
+        .setXorMappedAddressAttribute(rinfo);
+      socket.send(res.toBuffer(), rinfo.port, rinfo.address);
+    }
   }
 });
 
