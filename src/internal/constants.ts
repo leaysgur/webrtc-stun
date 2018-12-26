@@ -1,4 +1,4 @@
-import { numberToStringWithRadixAndPadding, calcMessageType } from './utils';
+import { calcMessageType } from './utils';
 
 const MESSAGE_METHOD = {
   BINDING: 0b000000000001,
