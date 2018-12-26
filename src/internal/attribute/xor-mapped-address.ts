@@ -1,5 +1,12 @@
 import { STUN_ATTRIBUTE_TYPE } from '../constants';
-import { bufferXor, calcPaddingByte } from '../utils';
+import {
+  bufferXor,
+  writeAttrBuffer,
+  ipV4BufferToString,
+  ipV4StringToBuffer,
+  ipV6BufferToString,
+  ipV6StringToBuffer,
+} from '../utils';
 import { Header } from '../header';
 
 /**
@@ -25,93 +32,77 @@ export class XorMappedAddressAttribute {
     private address: string,
   ) {}
 
-  // TODO: check IPv4 or IPv6
   toBuffer(header: Header): Buffer {
-    const family = Buffer.alloc(2);
-    family.writeUInt16BE(this.family === 'IPv4' ? 0x01 : 0x02, 0);
+    const $family = Buffer.alloc(2);
+    $family.writeUInt16BE(this.family === 'IPv4' ? 0x01 : 0x02, 0);
 
-    const port = Buffer.alloc(2);
-    port.writeUInt16BE(this.port, 0);
-    const xport = bufferXor(port, header.getMagicCookieAsBuffer());
+    const $xport = this.encodePort(this.port, header);
+    const $xaddress =
+      this.family === 'IPv4'
+        ? this.encodeIpV4(this.address, header)
+        : this.encodeIpV6(this.address, header);
 
-    const address = Buffer.from(this.address.split('.'));
-    const xaddress = bufferXor(address, header.getMagicCookieAsBuffer());
+    const $value = Buffer.concat([$family, $xport, $xaddress]);
 
-    const value = Buffer.concat([family, xport, xaddress]);
-    const paddingByte = calcPaddingByte(value.length, 4);
-    const padding = Buffer.alloc(paddingByte);
-
-    // 2byte(16bit) for type
-    const type = Buffer.alloc(2);
-    type.writeUInt16BE(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS, 0);
-
-    // 2byte(16bit) for length
-    const length = Buffer.alloc(2);
-    length.writeUInt16BE(value.length, 0);
-
-    return Buffer.concat([type, length, value, padding]);
+    return writeAttrBuffer(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS, $value);
   }
 
-  loadBuffer(attr: Buffer, header: Header): boolean {
-    const familyVal = attr.readUInt16BE(0);
-    this.family = {
-      [`${0x01}`]: 'IPv4',
-      [`${0x02}`]: 'IPv6',
-    }[familyVal];
+  loadBuffer($attr: Buffer, header: Header): boolean {
+    const family = $attr.readUInt16BE(0);
+    this.family = family === 0x01 ? 'IPv4' : 'IPv6';
 
-    this.port = parsePort(attr, header);
-
-    this.address = {
-      [`${0x01}`]: parseIpV4(attr, header),
-      [`${0x02}`]: parseIpV6(attr, header),
-    }[familyVal];
+    this.port = this.decodePort($attr, header);
+    this.address =
+      family === 0x01
+        ? this.decodeIpV4($attr, header)
+        : this.decodeIpV6($attr, header);
 
     return true;
   }
-}
 
-function parsePort(attr: Buffer, header: Header): number {
-  const xport = attr.slice(2, 4);
-
-  const xored = bufferXor(xport, header.getMagicCookieAsBuffer());
-  return xored.readUInt16BE(0);
-}
-
-function parseIpV4(attr: Buffer, header: Header): string {
-  const xaddress = attr.slice(4, 8);
-
-  const xored = bufferXor(xaddress, header.getMagicCookieAsBuffer());
-  return ipV4BufferToString(xored);
-}
-
-function parseIpV6(attr: Buffer, header: Header): string {
-  const xaddress = attr.slice(4, 20);
-
-  const xored = bufferXor(
-    xaddress,
-    Buffer.concat([
-      header.getMagicCookieAsBuffer(),
-      header.getTransactionIdAsBuffer(),
-    ]),
-  );
-  return ipV6BufferToString(xored);
-}
-
-function ipV4BufferToString(buf: Buffer): string {
-  const res = [];
-  for (const digit of buf) {
-    res.push(digit);
+  private decodePort($attr: Buffer, header: Header): number {
+    const $xport = $attr.slice(2, 4);
+    const $port = bufferXor($xport, header.getMagicCookieAsBuffer());
+    return $port.readUInt16BE(0);
   }
-  return res.join('.');
-}
-
-function ipV6BufferToString(buf: Buffer): string {
-  const res = [];
-  for (let i = 0; i < buf.length; i += 2) {
-    res.push(buf.readUInt16BE(i).toString(16));
+  private encodePort(port: number, header: Header): Buffer {
+    const $port = Buffer.alloc(2);
+    $port.writeUInt16BE(port, 0);
+    return bufferXor($port, header.getMagicCookieAsBuffer());
   }
-  return res
-    .join(':')
-    .replace(/(^|:)0(:0)*:0(:|$)/, '$1::$3')
-    .replace(/:{3,4}/, '::');
+
+  private decodeIpV4($attr: Buffer, header: Header): string {
+    const $xaddress = $attr.slice(4, 8);
+    const $ip = bufferXor($xaddress, header.getMagicCookieAsBuffer());
+    return ipV4BufferToString($ip);
+  }
+  private encodeIpV4(ip: string, header: Header): Buffer {
+    const $ip = ipV4StringToBuffer(ip);
+    const $xaddress = bufferXor($ip, header.getMagicCookieAsBuffer());
+    return $xaddress;
+  }
+
+  private decodeIpV6($attr: Buffer, header: Header): string {
+    const $xaddress = $attr.slice(4, 20);
+
+    const $ip = bufferXor(
+      $xaddress,
+      Buffer.concat([
+        header.getMagicCookieAsBuffer(),
+        header.getTransactionIdAsBuffer(),
+      ]),
+    );
+    return ipV6BufferToString($ip);
+  }
+  private encodeIpV6(ip: string, header: Header): Buffer {
+    const $ip = ipV6StringToBuffer(ip);
+    const $xaddress = bufferXor(
+      $ip,
+      Buffer.concat([
+        header.getMagicCookieAsBuffer(),
+        header.getTransactionIdAsBuffer(),
+      ]),
+    );
+    return $xaddress;
+  }
 }

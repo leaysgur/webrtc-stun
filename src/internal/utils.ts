@@ -8,7 +8,6 @@ export function getFirst2Bit($buffer: Buffer): string {
   // 8bit is enough to know first and second bit
   const first1byte = $buffer.readUInt8(0);
   const first8bit = numberToStringWithRadixAndPadding(first1byte, 2, 8);
-
   return first8bit.slice(0, 2);
 }
 
@@ -79,9 +78,6 @@ export function calcPaddingByte(curByte: number, boundaryByte: number): number {
   return paddingByte;
 }
 
-/**
- * Calculate XOR with Buffer
- */
 export function bufferXor(a: Buffer, b: Buffer): Buffer {
   const length = Math.max(a.length, b.length);
   const buffer = Buffer.allocUnsafe(length);
@@ -91,4 +87,51 @@ export function bufferXor(a: Buffer, b: Buffer): Buffer {
   }
 
   return buffer;
+}
+
+export function writeAttrBuffer(type: number, $value: Buffer): Buffer {
+  // 2byte(16bit) for type
+  const $type = Buffer.alloc(2);
+  $type.writeUInt16BE(type, 0);
+
+  // 2byte(16bit) for length
+  const $length = Buffer.alloc(2);
+  $length.writeUInt16BE($value.length, 0);
+
+  const paddingByte = calcPaddingByte($value.length, 4);
+  const $padding = Buffer.alloc(paddingByte);
+
+  return Buffer.concat([$type, $length, $value, $padding]);
+}
+
+export function ipV4BufferToString($ip: Buffer): string {
+  const res = [];
+  for (const digit of $ip) {
+    res.push(digit.toString());
+  }
+  return res.join('.');
+}
+export function ipV4StringToBuffer(ip: string): Buffer {
+  const res = Buffer.alloc(4);
+  let idx = 0;
+  for (const digit of ip.split('.')) {
+    res[idx] = parseInt(digit, 10);
+    idx++;
+  }
+  return res;
+}
+
+export function ipV6BufferToString($ip: Buffer): string {
+  const res = [];
+  for (let i = 0; i < $ip.length; i += 2) {
+    res.push($ip.readUInt16BE(i).toString(16));
+  }
+  return res
+    .join(':')
+    .replace(/(^|:)0(:0)*:0(:|$)/, '$1::$3')
+    .replace(/:{3,4}/, '::');
+}
+export function ipV6StringToBuffer(ip: string): Buffer {
+  // TODO: impl
+  return Buffer.from(ip);
 }
