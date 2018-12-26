@@ -1,3 +1,17 @@
+import { randomBytes } from 'crypto';
+
+export function generateTransactionId(): string {
+  return randomBytes(12).toString('hex');
+}
+
+export function getFirst2Bit($buffer: Buffer): string {
+  // 8bit is enough to know first and second bit
+  const first1byte = $buffer.readUInt8(0);
+  const first8bit = numberToStringWithRadixAndPadding(first1byte, 2, 8);
+
+  return first8bit.slice(0, 2);
+}
+
 /**
  *  0                 1
  *  2  3  4 5 6 7 8 9 0 1 2 3 4 5

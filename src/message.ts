@@ -1,6 +1,8 @@
+import { RemoteInfo } from 'dgram';
 import {
+  generateTransactionId,
+  getFirst2Bit,
   calcPaddingByte,
-  numberToStringWithRadixAndPadding,
 } from './internal/utils';
 import { Header } from './internal/header';
 import { SoftwareAttribute } from './internal/attribute/software';
@@ -10,25 +12,57 @@ import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './internal/constants';
 type Attribute = SoftwareAttribute | XorMappedAddressAttribute;
 
 export class StunMessage {
-  constructor(
-    private header: Header = new Header(),
-    private attributes: Map<number, Attribute> = new Map(),
-  ) {}
+  static create(): StunMessage {
+    return new StunMessage(new Header(0, generateTransactionId()));
+  }
+  static createBindingRequest(): StunMessage {
+    return new StunMessage(
+      new Header(STUN_MESSAGE_TYPE.BINDING_REQUEST, generateTransactionId()),
+    );
+  }
 
+  private header: Header;
+  private attributes: Map<number, Attribute>;
+  constructor(header: Header) {
+    this.header = header;
+    this.attributes = new Map();
+  }
+
+  createBindingResponse(isSuccess: boolean): StunMessage {
+    const type = isSuccess
+      ? STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS
+      : STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR;
+    const tid = this.header.transactionId;
+    return new StunMessage(new Header(type, tid));
+  }
+
+  isBindingRequest(): boolean {
+    return this.header.type === STUN_MESSAGE_TYPE.BINDING_REQUEST;
+  }
   isBindingResponseSuccess(): boolean {
     return this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS;
   }
-
-  setBindingRequestType(): StunMessage {
-    this.header.type = STUN_MESSAGE_TYPE.BINDING_REQUEST;
-
-    return this;
+  isBindingResponseError(): boolean {
+    return this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR;
   }
 
   setSoftwareAttribute(name: string): StunMessage {
     this.attributes.set(
       STUN_ATTRIBUTE_TYPE.SOFTWARE,
       new SoftwareAttribute(name),
+    );
+
+    return this;
+  }
+
+  setXorMappedAddressAttribute({
+    family,
+    port,
+    address,
+  }: RemoteInfo): StunMessage {
+    this.attributes.set(
+      STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS,
+      new XorMappedAddressAttribute(family, port, address),
     );
 
     return this;
@@ -50,7 +84,7 @@ export class StunMessage {
   }
 
   loadBuffer($buffer: Buffer): boolean {
-    if (!this.isFirst2BitZero($buffer)) {
+    if (getFirst2Bit($buffer) !== '00') {
       return false;
     }
 
@@ -101,14 +135,6 @@ export class StunMessage {
     }
 
     return true;
-  }
-
-  private isFirst2BitZero($buffer: Buffer): boolean {
-    // 8bit is enough to know first and second bit
-    const first1byte = $buffer.readUInt8(0);
-    const first8bit = numberToStringWithRadixAndPadding(first1byte, 2, 8);
-
-    return first8bit.slice(0, 2) === '00';
   }
 
   private getAttrByType(type: number): Attribute | null {

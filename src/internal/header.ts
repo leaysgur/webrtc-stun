@@ -1,5 +1,3 @@
-import * as crypto from 'crypto';
-
 /*
  * STUN Message Header
  *
@@ -17,19 +15,23 @@ import * as crypto from 'crypto';
  *
  */
 export class Header {
-  constructor(
-    private _type: number = 0,
-    private _length: number = 0,
-    private _magicCookie: number = 0x2112a442,
-    private _transactionId: string = crypto.randomBytes(12).toString('hex'),
-  ) {}
+  private _type: number;
+  private _length: number;
+  private _magicCookie: number;
+  private _transactionId: string;
+  constructor(type: number, transactionId: string) {
+    this._type = type;
+    this._length = 0;
+    this._magicCookie = 0x2112a442;
+    this._transactionId = transactionId;
+  }
 
   get type(): number {
     return this._type;
   }
-  // TODO: いる？constructor()でいいのでは？
-  set type(type: number) {
-    this._type = type;
+
+  get transactionId(): string {
+    return this._transactionId;
   }
 
   getMagicCookieAsBuffer(): Buffer {
