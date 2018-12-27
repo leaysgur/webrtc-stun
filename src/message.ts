@@ -62,14 +62,10 @@ export class StunMessage {
     return attr instanceof UsernameAttribute ? attr : null;
   }
 
-  setXorMappedAddressAttribute({
-    family,
-    port,
-    address,
-  }: RemoteInfo): StunMessage {
+  setXorMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
     this.attributes.set(
       STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS,
-      new XorMappedAddressAttribute(family, port, address),
+      new XorMappedAddressAttribute(rinfo.family, rinfo.port, rinfo.address),
     );
     return this;
   }
