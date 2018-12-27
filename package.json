@@ -1,7 +1,7 @@
 {
   "name": "webrtc-stun",
   "version": "0.0.0",
-  "description": "Pure JavaScript STUN implementation for only WebRTC related part.",
+  "description": "Pure TypeScript STUN implementation.",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [
@@ -24,7 +24,9 @@
   "keywords": [
     "webrtc",
     "nodejs",
-    "stun"
+    "typescript",
+    "stun",
+    "rfc5389"
   ],
   "author": "leader22",
   "license": "MIT"

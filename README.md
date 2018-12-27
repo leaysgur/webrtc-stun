@@ -1,6 +1,9 @@
 # webrtc-stun
 
-Pure JavaScript 0 dependencies STUN implementation only for WebRTC related part.
+STUN implementation with TypeScript.
+
+- 0 dependencies
+- only for WebRTC related part
 
 ## Supported
 - [RFC 5389](https://tools.ietf.org/html/rfc5389)
@@ -8,7 +11,16 @@ Pure JavaScript 0 dependencies STUN implementation only for WebRTC related part.
   - [USERNAME](https://tools.ietf.org/html/rfc5389#section-15.3)
   - [SOFTWARE](https://tools.ietf.org/html/rfc5389#section-15.10)
 
+## TODO
+- [MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.1)
+- [MESSAGE-INTEGRITY](https://tools.ietf.org/html/rfc5389#section-15.4)
+- [FINGERPRINT](https://tools.ietf.org/html/rfc5389#section-15.5)
+- test
+
 ## Usage
 
-See `examples` directory.
+```
+npm i webrtc-stun
+```
 
+See also `examples` directory.
