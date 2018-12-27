@@ -50,13 +50,16 @@ export class StunMessage {
     return this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR;
   }
 
-  setSoftwareAttribute(name: string): StunMessage {
+  setUsernameAttribute(name: string): StunMessage {
     this.attributes.set(
-      STUN_ATTRIBUTE_TYPE.SOFTWARE,
-      new SoftwareAttribute(name),
+      STUN_ATTRIBUTE_TYPE.USERNAME,
+      new UsernameAttribute(name),
     );
-
     return this;
+  }
+  getUsernameAttribute(): UsernameAttribute | null {
+    const attr = this.attributes.get(STUN_ATTRIBUTE_TYPE.USERNAME);
+    return attr instanceof UsernameAttribute ? attr : null;
   }
 
   setXorMappedAddressAttribute({
@@ -68,14 +71,23 @@ export class StunMessage {
       STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS,
       new XorMappedAddressAttribute(family, port, address),
     );
-
     return this;
   }
-
   getXorMappedAddressAttribute(): XorMappedAddressAttribute | null {
     const attr = this.attributes.get(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS);
-
     return attr instanceof XorMappedAddressAttribute ? attr : null;
+  }
+
+  setSoftwareAttribute(name: string): StunMessage {
+    this.attributes.set(
+      STUN_ATTRIBUTE_TYPE.SOFTWARE,
+      new SoftwareAttribute(name),
+    );
+    return this;
+  }
+  getSoftwareAttribute(): SoftwareAttribute | null {
+    const attr = this.attributes.get(STUN_ATTRIBUTE_TYPE.SOFTWARE);
+    return attr instanceof SoftwareAttribute ? attr : null;
   }
 
   toBuffer(): Buffer {
@@ -129,7 +141,7 @@ export class StunMessage {
         continue;
       }
 
-      const attr = this.getAttrByType(type);
+      const attr = this.getBlankAttributeByType(type);
       // skip not supported
       if (attr === null) {
         console.log(
@@ -149,7 +161,7 @@ export class StunMessage {
     return true;
   }
 
-  private getAttrByType(type: number): Attribute | null {
+  private getBlankAttributeByType(type: number): Attribute | null {
     const Attr = {
       [`${STUN_ATTRIBUTE_TYPE.USERNAME}`]: UsernameAttribute,
       [`${STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS}`]: XorMappedAddressAttribute,
