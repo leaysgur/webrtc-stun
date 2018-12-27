@@ -5,11 +5,15 @@ import {
   calcPaddingByte,
 } from './internal/utils';
 import { Header } from './internal/header';
-import { SoftwareAttribute } from './internal/attribute/software';
+import { UsernameAttribute } from './internal/attribute/username';
 import { XorMappedAddressAttribute } from './internal/attribute/xor-mapped-address';
+import { SoftwareAttribute } from './internal/attribute/software';
 import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './internal/constants';
 
-type Attribute = SoftwareAttribute | XorMappedAddressAttribute;
+type Attribute =
+  | UsernameAttribute
+  | XorMappedAddressAttribute
+  | SoftwareAttribute;
 
 export class StunMessage {
   static createBlank(): StunMessage {
@@ -147,8 +151,9 @@ export class StunMessage {
 
   private getAttrByType(type: number): Attribute | null {
     const Attr = {
-      [`${STUN_ATTRIBUTE_TYPE.SOFTWARE}`]: SoftwareAttribute,
+      [`${STUN_ATTRIBUTE_TYPE.USERNAME}`]: UsernameAttribute,
       [`${STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS}`]: XorMappedAddressAttribute,
+      [`${STUN_ATTRIBUTE_TYPE.SOFTWARE}`]: SoftwareAttribute,
     }[type];
 
     return Attr ? Attr.createBlank() : null;
