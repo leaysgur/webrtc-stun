@@ -16,6 +16,7 @@
     "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.2.2"
   },
+  "dependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "tslint -p . --fix && tsc -p . --noEmit",
@@ -29,5 +30,13 @@
     "rfc5389"
   ],
   "author": "leader22",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leader22/webrtc-stun.git"
+  },
+  "bugs": {
+    "url": "https://github.com/leader22/webrtc-stun/issues"
+  },
+  "homepage": "https://github.com/leader22/webrtc-stun#readme"
 }
