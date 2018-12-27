@@ -62,26 +62,23 @@ export class XorMappedAddressAttribute {
 
   private decodePort($attr: Buffer, header: Header): number {
     const $xport = $attr.slice(2, 4);
-    const $port = bufferXor(
-      $xport,
-      header.getMagicCookieAsBuffer().slice(0, 2),
-    );
+    const $port = bufferXor($xport, header.magicCookieAsBuffer.slice(0, 2));
     return $port.readUInt16BE(0);
   }
   private encodePort(port: number, header: Header): Buffer {
     const $port = Buffer.alloc(2);
     $port.writeUInt16BE(port, 0);
-    return bufferXor($port, header.getMagicCookieAsBuffer().slice(0, 2));
+    return bufferXor($port, header.magicCookieAsBuffer.slice(0, 2));
   }
 
   private decodeIpV4($attr: Buffer, header: Header): string {
     const $xaddress = $attr.slice(4, 8);
-    const $ip = bufferXor($xaddress, header.getMagicCookieAsBuffer());
+    const $ip = bufferXor($xaddress, header.magicCookieAsBuffer);
     return ipV4BufferToString($ip);
   }
   private encodeIpV4(ip: string, header: Header): Buffer {
     const $ip = ipV4StringToBuffer(ip);
-    const $xaddress = bufferXor($ip, header.getMagicCookieAsBuffer());
+    const $xaddress = bufferXor($ip, header.magicCookieAsBuffer);
     return $xaddress;
   }
 
@@ -90,10 +87,7 @@ export class XorMappedAddressAttribute {
 
     const $ip = bufferXor(
       $xaddress,
-      Buffer.concat([
-        header.getMagicCookieAsBuffer(),
-        header.getTransactionIdAsBuffer(),
-      ]),
+      Buffer.concat([header.magicCookieAsBuffer, header.transactionIdAsBuffer]),
     );
     return ipV6BufferToString($ip);
   }
@@ -101,10 +95,7 @@ export class XorMappedAddressAttribute {
     const $ip = ipV6StringToBuffer(ip);
     const $xaddress = bufferXor(
       $ip,
-      Buffer.concat([
-        header.getMagicCookieAsBuffer(),
-        header.getTransactionIdAsBuffer(),
-      ]),
+      Buffer.concat([header.magicCookieAsBuffer, header.transactionIdAsBuffer]),
     );
     return $xaddress;
   }

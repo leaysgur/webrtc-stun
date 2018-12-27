@@ -40,14 +40,14 @@ export class Header {
     return this._transactionId;
   }
 
-  getMagicCookieAsBuffer(): Buffer {
+  get magicCookieAsBuffer(): Buffer {
     const $magicCookie = Buffer.alloc(4);
     $magicCookie.writeInt32BE(this._magicCookie, 0);
 
     return $magicCookie;
   }
 
-  getTransactionIdAsBuffer(): Buffer {
+  get transactionIdAsBuffer(): Buffer {
     const $transactionId = Buffer.alloc(12);
     $transactionId.write(this._transactionId, 0, 12, 'hex');
 
@@ -64,8 +64,8 @@ export class Header {
     return Buffer.concat([
       $type,
       $length,
-      this.getMagicCookieAsBuffer(),
-      this.getTransactionIdAsBuffer(),
+      this.magicCookieAsBuffer,
+      this.transactionIdAsBuffer,
     ]);
   }
 
