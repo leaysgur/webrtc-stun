@@ -1,3 +1,5 @@
+import { numberToBinaryStringWithPadding } from './utils';
+
 /*
  * STUN Message Header
  *
@@ -28,6 +30,10 @@ export class Header {
 
   get type(): number {
     return this._type;
+  }
+
+  get length(): number {
+    return this._length;
   }
 
   get transactionId(): string {
@@ -70,6 +76,7 @@ export class Header {
     this._transactionId = $header.slice(8, 20).toString('hex');
 
     // TODO: check type(cls, mtd)
+    console.log(numberToBinaryStringWithPadding(this._type, 16));
 
     if (this._magicCookie !== 0x2112a442) {
       return false;

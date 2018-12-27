@@ -4,13 +4,6 @@ export function generateTransactionId(): string {
   return randomBytes(12).toString('hex');
 }
 
-export function getFirst2Bit($buffer: Buffer): string {
-  // 8bit is enough to know first and second bit
-  const first1byte = $buffer.readUInt8(0);
-  const first8bit = numberToStringWithRadixAndPadding(first1byte, 2, 8);
-  return first8bit.slice(0, 2);
-}
-
 /**
  *  0                 1
  *  2  3  4 5 6 7 8 9 0 1 2 3 4 5
@@ -34,8 +27,8 @@ export function getFirst2Bit($buffer: Buffer): string {
  * BINDING_RESPONSE_ERROR: 0x0111 = 273
  */
 export function calcMessageType(method: number, klass: number): number {
-  const methodStr = numberToStringWithRadixAndPadding(method, 2, 12);
-  const classStr = numberToStringWithRadixAndPadding(klass, 2, 2);
+  const methodStr = numberToBinaryStringWithPadding(method, 12);
+  const classStr = numberToBinaryStringWithPadding(klass, 2);
 
   const m1 = methodStr.slice(0, 5);
   const m2 = methodStr.slice(5, 8);
@@ -51,16 +44,15 @@ export function calcMessageType(method: number, klass: number): number {
 /**
  * The toString for bit operation
  *
- * (1, 2, 4) -> 0001
- * (10, 2, 4) -> 1010
- * (257, 16, 8) -> 00000101
+ * (1, 4) -> 0001
+ * (10, 4) -> 1010
+ * (257, 8) -> 00000101
  */
-export function numberToStringWithRadixAndPadding(
+export function numberToBinaryStringWithPadding(
   num: number,
-  radix: number = 2,
   digit: number = 0,
 ): string {
-  return num.toString(radix).padStart(digit, '0');
+  return num.toString(2).padStart(digit, '0');
 }
 
 /**

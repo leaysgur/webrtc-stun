@@ -1,7 +1,7 @@
 import { RemoteInfo } from 'dgram';
 import {
   generateTransactionId,
-  getFirst2Bit,
+  numberToBinaryStringWithPadding,
   calcPaddingByte,
 } from './internal/utils';
 import { Header } from './internal/header';
@@ -84,15 +84,22 @@ export class StunMessage {
   }
 
   loadBuffer($buffer: Buffer): boolean {
-    if (getFirst2Bit($buffer) !== '00') {
+    // the first two bits are 0 in first 1byte
+    if (!numberToBinaryStringWithPadding($buffer[0], 8).startsWith('00')) {
       return false;
     }
 
+    // STUN message header is 20byte
     const $header = $buffer.slice(0, 20);
     const $body = $buffer.slice(20, $buffer.length);
 
     // load header
     if (!this.header.loadBuffer($header)) {
+      return false;
+    }
+
+    // message length + 20(header) = total length
+    if (this.header.length + 20 !== $buffer.length) {
       return false;
     }
 
