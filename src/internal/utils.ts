@@ -30,15 +30,60 @@ export function calcMessageType(method: number, klass: number): number {
   const methodStr = numberToBinaryStringWithPadding(method, 12);
   const classStr = numberToBinaryStringWithPadding(klass, 2);
 
-  const m1 = methodStr.slice(0, 5);
-  const m2 = methodStr.slice(5, 8);
-  const m3 = methodStr.slice(8, 12);
-  const c1 = classStr.slice(0, 1);
-  const c2 = classStr.slice(1, 2);
+  const [m11, m10, m9, m8, m7, m6, m5, m4, m3, m2, m1, m0] = methodStr.split(
+    '',
+  );
+  const [c1, c0] = classStr.split('');
 
   // 16bit string
-  const binStr = `00${m1}${c1}${m2}${c2}${m3}`;
+  const binStr = [
+    '0',
+    '0',
+    m11,
+    m10,
+    m9,
+    m8,
+    m7,
+    c1,
+    m6,
+    m5,
+    m4,
+    c0,
+    m3,
+    m2,
+    m1,
+    m0,
+  ].join('');
+
   return parseInt(binStr, 2);
+}
+
+export function messageTypeToMethodAndClass(type: number): [number, number] {
+  const messageType = numberToBinaryStringWithPadding(type, 16);
+  // first 2 bit is 0 and not used as message type
+  const [
+    ,
+    ,
+    m11,
+    m10,
+    m9,
+    m8,
+    m7,
+    c1,
+    m6,
+    m5,
+    m4,
+    c0,
+    m3,
+    m2,
+    m1,
+    m0,
+  ] = messageType.split('');
+
+  const methodStr = [m11, m10, m9, m8, m7, m6, m5, m4, m3, m2, m1, m0].join('');
+  const classStr = [c1, c0].join('');
+
+  return [parseInt(classStr, 2), parseInt(methodStr, 2)];
 }
 
 /**

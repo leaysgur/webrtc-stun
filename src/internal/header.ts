@@ -1,4 +1,4 @@
-import { numberToBinaryStringWithPadding } from './utils';
+import { messageTypeToMethodAndClass } from './utils';
 
 /*
  * STUN Message Header
@@ -76,7 +76,8 @@ export class Header {
     this._transactionId = $header.slice(8, 20).toString('hex');
 
     // TODO: check type(cls, mtd)
-    console.log(numberToBinaryStringWithPadding(this._type, 16));
+    const [c, m] = messageTypeToMethodAndClass(this._type);
+    console.log(c, m);
 
     if (this._magicCookie !== 0x2112a442) {
       return false;
