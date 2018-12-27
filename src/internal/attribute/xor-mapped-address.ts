@@ -9,6 +9,12 @@ import {
 } from '../utils';
 import { Header } from '../header';
 
+export interface XorMappedAddressPayload {
+  family: string;
+  port: number;
+  address: string;
+}
+
 /**
  * STUN XOR_MAPPED_ADDRESS Attribute
  *
@@ -31,6 +37,14 @@ export class XorMappedAddressAttribute {
     private port: number,
     private address: string,
   ) {}
+
+  get payload(): XorMappedAddressPayload {
+    return {
+      family: this.family,
+      port: this.port,
+      address: this.address,
+    };
+  }
 
   toBuffer(header: Header): Buffer {
     const $family = Buffer.alloc(2);

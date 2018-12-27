@@ -5,9 +5,18 @@ import {
   calcPaddingByte,
 } from './internal/utils';
 import { Header } from './internal/header';
-import { UsernameAttribute } from './internal/attribute/username';
-import { XorMappedAddressAttribute } from './internal/attribute/xor-mapped-address';
-import { SoftwareAttribute } from './internal/attribute/software';
+import {
+  UsernameAttribute,
+  UsernamePayload,
+} from './internal/attribute/username';
+import {
+  XorMappedAddressAttribute,
+  XorMappedAddressPayload,
+} from './internal/attribute/xor-mapped-address';
+import {
+  SoftwareAttribute,
+  SoftwarePayload,
+} from './internal/attribute/software';
 import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './internal/constants';
 
 type Attribute =
@@ -57,9 +66,8 @@ export class StunMessage {
     );
     return this;
   }
-  getUsernameAttribute(): UsernameAttribute | null {
-    const attr = this.attributes.get(STUN_ATTRIBUTE_TYPE.USERNAME);
-    return attr instanceof UsernameAttribute ? attr : null;
+  getUsernameAttribute(): UsernamePayload | null {
+    return this.getPayloadByType<UsernamePayload>(STUN_ATTRIBUTE_TYPE.USERNAME);
   }
 
   setXorMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
@@ -69,9 +77,10 @@ export class StunMessage {
     );
     return this;
   }
-  getXorMappedAddressAttribute(): XorMappedAddressAttribute | null {
-    const attr = this.attributes.get(STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS);
-    return attr instanceof XorMappedAddressAttribute ? attr : null;
+  getXorMappedAddressAttribute(): XorMappedAddressPayload | null {
+    return this.getPayloadByType<XorMappedAddressPayload>(
+      STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS,
+    );
   }
 
   setSoftwareAttribute(name: string): StunMessage {
@@ -81,9 +90,8 @@ export class StunMessage {
     );
     return this;
   }
-  getSoftwareAttribute(): SoftwareAttribute | null {
-    const attr = this.attributes.get(STUN_ATTRIBUTE_TYPE.SOFTWARE);
-    return attr instanceof SoftwareAttribute ? attr : null;
+  getSoftwareAttribute(): SoftwarePayload | null {
+    return this.getPayloadByType<SoftwarePayload>(STUN_ATTRIBUTE_TYPE.SOFTWARE);
   }
 
   toBuffer(): Buffer {
@@ -155,6 +163,11 @@ export class StunMessage {
     }
 
     return true;
+  }
+
+  private getPayloadByType<T>(type: number): T | null {
+    const attr = this.attributes.get(type);
+    return attr !== undefined ? ((attr.payload as unknown) as T) : null;
   }
 
   private getBlankAttributeByType(type: number): Attribute | null {
