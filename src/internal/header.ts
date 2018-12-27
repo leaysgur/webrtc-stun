@@ -1,4 +1,7 @@
-import { messageTypeToMethodAndClass } from './utils';
+import { STUN_MESSAGE_TYPE } from './constants';
+
+const MAGIC_COOKIE = 0x2112a442;
+const STUN_MESSAGE_TYPE_VALUES = Object.values(STUN_MESSAGE_TYPE);
 
 /*
  * STUN Message Header
@@ -24,7 +27,7 @@ export class Header {
   constructor(type: number, transactionId: string) {
     this._type = type;
     this._length = 0;
-    this._magicCookie = 0x2112a442;
+    this._magicCookie = MAGIC_COOKIE;
     this._transactionId = transactionId;
   }
 
@@ -75,11 +78,12 @@ export class Header {
     this._magicCookie = $header.readUInt32BE(4);
     this._transactionId = $header.slice(8, 20).toString('hex');
 
-    // TODO: check type(cls, mtd)
-    const [c, m] = messageTypeToMethodAndClass(this._type);
-    console.log(c, m);
+    // check message type(skip to split it into cls and mtd)
+    if (!STUN_MESSAGE_TYPE_VALUES.includes(this._type)) {
+      return false;
+    }
 
-    if (this._magicCookie !== 0x2112a442) {
+    if (this._magicCookie !== MAGIC_COOKIE) {
       return false;
     }
 

@@ -1,7 +1,7 @@
 import { RemoteInfo } from 'dgram';
 import {
   generateTransactionId,
-  numberToBinaryStringWithPadding,
+  numberToBinaryStringArray,
   calcPaddingByte,
 } from './internal/utils';
 import { Header } from './internal/header';
@@ -84,8 +84,9 @@ export class StunMessage {
   }
 
   loadBuffer($buffer: Buffer): boolean {
-    // the first two bits are 0 in first 1byte
-    if (!numberToBinaryStringWithPadding($buffer[0], 8).startsWith('00')) {
+    // the first 2bit are 0 in first 1byte
+    const first8bit = numberToBinaryStringArray($buffer[0], 8);
+    if (!(first8bit[0] === '0' && first8bit[1] === '0')) {
       return false;
     }
 

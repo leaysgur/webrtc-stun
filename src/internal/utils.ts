@@ -18,7 +18,7 @@ export function generateTransactionId(): string {
  * and combined together as 14bit string,
  * and append first 2bit as `00`.
  *
- * Thus STUN Message Type becomes 16bit,
+ * Thus STUN message type becomes 16bit,
  * and finally it is returned as number.
  *
  * BINDING_REQUEST: 0x0001 = 1
@@ -26,14 +26,25 @@ export function generateTransactionId(): string {
  * BINDING_RESPONSE_SUCCESS: 0x0101 = 257
  * BINDING_RESPONSE_ERROR: 0x0111 = 273
  */
-export function calcMessageType(method: number, klass: number): number {
-  const methodStr = numberToBinaryStringWithPadding(method, 12);
-  const classStr = numberToBinaryStringWithPadding(klass, 2);
-
-  const [m11, m10, m9, m8, m7, m6, m5, m4, m3, m2, m1, m0] = methodStr.split(
-    '',
-  );
-  const [c1, c0] = classStr.split('');
+export function methodAndClassToMessageType([method, klass]: [
+  number,
+  number
+]): number {
+  const [
+    m11,
+    m10,
+    m9,
+    m8,
+    m7,
+    m6,
+    m5,
+    m4,
+    m3,
+    m2,
+    m1,
+    m0,
+  ] = numberToBinaryStringArray(method, 12);
+  const [c1, c0] = numberToBinaryStringArray(klass, 2);
 
   // 16bit string
   const binStr = [
@@ -58,46 +69,19 @@ export function calcMessageType(method: number, klass: number): number {
   return parseInt(binStr, 2);
 }
 
-export function messageTypeToMethodAndClass(type: number): [number, number] {
-  const messageType = numberToBinaryStringWithPadding(type, 16);
-  // first 2 bit is 0 and not used as message type
-  const [
-    ,
-    ,
-    m11,
-    m10,
-    m9,
-    m8,
-    m7,
-    c1,
-    m6,
-    m5,
-    m4,
-    c0,
-    m3,
-    m2,
-    m1,
-    m0,
-  ] = messageType.split('');
-
-  const methodStr = [m11, m10, m9, m8, m7, m6, m5, m4, m3, m2, m1, m0].join('');
-  const classStr = [c1, c0].join('');
-
-  return [parseInt(classStr, 2), parseInt(methodStr, 2)];
-}
-
 /**
  * The toString for bit operation
  *
- * (1, 4) -> 0001
- * (10, 4) -> 1010
- * (257, 8) -> 00000101
+ * (1, 4) -> [0, 0, 0, 1]
+ * (10, 4) -> [1, 0, 1, 0]
+ * (257, 8) -> [0, 0, 0, 0, 0, 1, 0, 1]
  */
-export function numberToBinaryStringWithPadding(
+export function numberToBinaryStringArray(
   num: number,
   digit: number = 0,
-): string {
-  return num.toString(2).padStart(digit, '0');
+): string[] {
+  const binStr = num.toString(2).padStart(digit, '0');
+  return binStr.split('');
 }
 
 /**
@@ -116,6 +100,7 @@ export function calcPaddingByte(curByte: number, boundaryByte: number): number {
 }
 
 export function bufferXor(a: Buffer, b: Buffer): Buffer {
+  // a and b should have same length
   const length = a.length;
   const buffer = Buffer.allocUnsafe(length);
 
