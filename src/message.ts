@@ -14,6 +14,10 @@ import {
   UsernamePayload,
 } from './internal/attribute/username';
 import {
+  MessageIntegrityAttribute,
+  MessageIntegrityPayload,
+} from './internal/attribute/message-integrity';
+import {
   XorMappedAddressAttribute,
   XorMappedAddressPayload,
 } from './internal/attribute/xor-mapped-address';
@@ -26,6 +30,7 @@ import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './internal/constants';
 type Attribute =
   | MappedAddressAttribute
   | UsernameAttribute
+  | MessageIntegrityAttribute
   | XorMappedAddressAttribute
   | SoftwareAttribute;
 
@@ -82,6 +87,16 @@ export class StunMessage {
   }
   getUsernameAttribute(): UsernamePayload | null {
     return this.getPayloadByType<UsernamePayload>(STUN_ATTRIBUTE_TYPE.USERNAME);
+  }
+
+  setMessageIntegrityAttribute(key: string): StunMessage {
+    this.attributes.push(new MessageIntegrityAttribute(key));
+    return this;
+  }
+  getMessageIntegrityAttribute(): MessageIntegrityPayload | null {
+    return this.getPayloadByType<MessageIntegrityPayload>(
+      STUN_ATTRIBUTE_TYPE.MESSAGE_INTEGRITY,
+    );
   }
 
   setXorMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
@@ -185,6 +200,7 @@ export class StunMessage {
     const Attr = {
       [`${STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS}`]: MappedAddressAttribute,
       [`${STUN_ATTRIBUTE_TYPE.USERNAME}`]: UsernameAttribute,
+      [`${STUN_ATTRIBUTE_TYPE.MESSAGE_INTEGRITY}`]: MessageIntegrityAttribute,
       [`${STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS}`]: XorMappedAddressAttribute,
       [`${STUN_ATTRIBUTE_TYPE.SOFTWARE}`]: SoftwareAttribute,
     }[type];
