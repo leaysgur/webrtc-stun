@@ -6,7 +6,6 @@ import {
   ipV6BufferToString,
   ipV6StringToBuffer,
 } from '../utils';
-import { Header } from '../header';
 
 export interface MappedAddressPayload {
   family: string;
@@ -49,7 +48,7 @@ export class MappedAddressAttribute {
     };
   }
 
-  toBuffer(_header: Header): Buffer {
+  toBuffer(): Buffer {
     const $family = Buffer.alloc(2);
     $family.writeUInt16BE(this.family === 'IPv4' ? 0x01 : 0x02, 0);
 
@@ -65,7 +64,7 @@ export class MappedAddressAttribute {
     return writeAttrBuffer(STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS, $value);
   }
 
-  loadBuffer($attr: Buffer, _header: Header): boolean {
+  loadBuffer($attr: Buffer): boolean {
     const family = $attr.readUInt16BE(0);
     this.family = family === 0x01 ? 'IPv4' : 'IPv6';
 

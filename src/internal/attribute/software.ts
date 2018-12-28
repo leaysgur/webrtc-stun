@@ -1,9 +1,8 @@
 import { STUN_ATTRIBUTE_TYPE } from '../constants';
 import { writeAttrBuffer } from '../utils';
-import { Header } from '../header';
 
 export interface SoftwarePayload {
-  name: string;
+  value: string;
 }
 
 export class SoftwareAttribute {
@@ -11,24 +10,24 @@ export class SoftwareAttribute {
     return new SoftwareAttribute('');
   }
 
-  constructor(private name: string) {}
+  constructor(private value: string) {}
 
   get type(): number {
     return STUN_ATTRIBUTE_TYPE.SOFTWARE;
   }
 
   get payload(): SoftwarePayload {
-    return { name: this.name };
+    return { value: this.value };
   }
 
-  toBuffer(_header: Header): Buffer {
-    const $value = Buffer.from(this.name);
+  toBuffer(): Buffer {
+    const $value = Buffer.from(this.value);
 
     return writeAttrBuffer(STUN_ATTRIBUTE_TYPE.SOFTWARE, $value);
   }
 
   loadBuffer($attr: Buffer): boolean {
-    this.name = $attr.toString();
+    this.value = $attr.toString();
 
     return true;
   }
