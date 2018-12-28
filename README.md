@@ -1,27 +1,65 @@
 # webrtc-stun
 
-STUN implementation with TypeScript.
-
-- 0 dependencies
-- only for WebRTC related part
-
-## Supported
-- [RFC5389](https://tools.ietf.org/html/rfc5389)
-  - [MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.1)
-  - [USERNAME](https://tools.ietf.org/html/rfc5389#section-15.3)
-  - [MESSAGE-INTEGRITY](https://tools.ietf.org/html/rfc5389#section-15.4)
-  - [XOR-MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.2)
-  - [SOFTWARE](https://tools.ietf.org/html/rfc5389#section-15.10)
-
-## TODO
-- [FINGERPRINT](https://tools.ietf.org/html/rfc5389#section-15.5)
-- [RFC8445](https://tools.ietf.org/html/rfc8445)
-- test
-
-## Usage
+STUN implementation for WebRTC.
 
 ```
 npm i webrtc-stun
+```
+
+- 0 dependencies
+- 100% TypeScript
+
+Currently only supports [RFC5389](https://tools.ietf.org/html/rfc5389) and still WIP.
+
+## Supported attribute
+- [MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.1)
+  - IPv4 only
+- [XOR-MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.2)
+  - IPv4 only
+- [USERNAME](https://tools.ietf.org/html/rfc5389#section-15.3)
+- [MESSAGE-INTEGRITY](https://tools.ietf.org/html/rfc5389#section-15.4)
+- [SOFTWARE](https://tools.ietf.org/html/rfc5389#section-15.10)
+
+## Not supported
+- [FINGERPRINT](https://tools.ietf.org/html/rfc5389#section-15.5)
+- [ERROR-CODE](https://tools.ietf.org/html/rfc5389#section-15.6)
+- [REALM](https://tools.ietf.org/html/rfc5389#section-15.7)
+- [NONCE](https://tools.ietf.org/html/rfc5389#section-15.8)
+- [UNKNOWN-ATTRIBUTES](https://tools.ietf.org/html/rfc5389#section-15.9)
+- [ALTERNATE-SERVER](https://tools.ietf.org/html/rfc5389#section-15.11)
+
+## Usage
+
+```javascript
+const dgram = require('dgram');
+const { StunMessage } = require('webrtc-stun');
+const pkg = require('../package.json');
+
+const socket = dgram.createSocket({ type: 'udp4' });
+
+socket.on('message', msg => {
+  const res = StunMessage.createBlank();
+
+  // if msg is valid STUN message
+  if (res.loadBuffer(msg)) {
+    // if msg is BINDING_RESPONSE_SUCCESS
+    if (res.isBindingResponseSuccess()) {
+      const attr = res.getXorMappedAddressAttribute();
+      // if msg includes attr
+      if (attr) {
+        console.log('RESPONSE', res);
+      }
+    }
+  }
+
+  socket.close();
+});
+
+const req = StunMessage
+  .createBindingRequest()
+  .setSoftwareAttribute(`${pkg.name}@${pkg.version}`);
+console.log('REQUEST', req);
+socket.send(req.toBuffer(), 19302, 'stun.l.google.com');
 ```
 
 See also `examples` directory.
