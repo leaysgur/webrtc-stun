@@ -29,7 +29,7 @@ export const STUN_MESSAGE_TYPE = {
 
 export const STUN_ATTRIBUTE_TYPE = {
   // RFC 5389 Required types
-  // MAPPED_ADDRESS: 0x0001,
+  MAPPED_ADDRESS: 0x0001,
   USERNAME: 0x0006,
   // MESSAGE_INTEGRITY: 0x0007,
   // ERROR_CODE: 0x0009,

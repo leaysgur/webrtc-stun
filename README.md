@@ -7,12 +7,12 @@ STUN implementation with TypeScript.
 
 ## Supported
 - [RFC 5389](https://tools.ietf.org/html/rfc5389)
-  - [XOR-MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.2)
+  - [MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.1)
   - [USERNAME](https://tools.ietf.org/html/rfc5389#section-15.3)
+  - [XOR-MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.2)
   - [SOFTWARE](https://tools.ietf.org/html/rfc5389#section-15.10)
 
 ## TODO
-- [MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.1)
 - [MESSAGE-INTEGRITY](https://tools.ietf.org/html/rfc5389#section-15.4)
 - [FINGERPRINT](https://tools.ietf.org/html/rfc5389#section-15.5)
 - test

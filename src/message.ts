@@ -6,6 +6,10 @@ import {
 } from './internal/utils';
 import { Header } from './internal/header';
 import {
+  MappedAddressAttribute,
+  MappedAddressPayload,
+} from './internal/attribute/mapped-address';
+import {
   UsernameAttribute,
   UsernamePayload,
 } from './internal/attribute/username';
@@ -20,6 +24,7 @@ import {
 import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './internal/constants';
 
 type Attribute =
+  | MappedAddressAttribute
   | UsernameAttribute
   | XorMappedAddressAttribute
   | SoftwareAttribute;
@@ -57,6 +62,19 @@ export class StunMessage {
   }
   isBindingResponseError(): boolean {
     return this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR;
+  }
+
+  setMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
+    this.attributes.set(
+      STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS,
+      new MappedAddressAttribute(rinfo.family, rinfo.port, rinfo.address),
+    );
+    return this;
+  }
+  getMappedAddressAttribute(): MappedAddressPayload | null {
+    return this.getPayloadByType<MappedAddressPayload>(
+      STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS,
+    );
   }
 
   setUsernameAttribute(name: string): StunMessage {
@@ -170,6 +188,7 @@ export class StunMessage {
 
   private getBlankAttributeByType(type: number): Attribute | null {
     const Attr = {
+      [`${STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS}`]: MappedAddressAttribute,
       [`${STUN_ATTRIBUTE_TYPE.USERNAME}`]: UsernameAttribute,
       [`${STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS}`]: XorMappedAddressAttribute,
       [`${STUN_ATTRIBUTE_TYPE.SOFTWARE}`]: SoftwareAttribute,
