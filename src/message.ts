@@ -66,9 +66,6 @@ export class StunMessage {
   isBindingResponseSuccess(): boolean {
     return this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS;
   }
-  isBindingResponseError(): boolean {
-    return this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR;
-  }
 
   setMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
     this.attributes.push(
