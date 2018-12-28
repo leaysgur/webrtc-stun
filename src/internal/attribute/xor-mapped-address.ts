@@ -38,6 +38,10 @@ export class XorMappedAddressAttribute {
     private address: string,
   ) {}
 
+  get type(): number {
+    return STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS;
+  }
+
   get payload(): XorMappedAddressPayload {
     return {
       family: this.family,

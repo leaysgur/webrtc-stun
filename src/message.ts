@@ -40,10 +40,10 @@ export class StunMessage {
   }
 
   private header: Header;
-  private attributes: Map<number, Attribute>;
+  private attributes: Attribute[];
   constructor(header: Header) {
     this.header = header;
-    this.attributes = new Map();
+    this.attributes = [];
   }
 
   createBindingResponse(isSuccess: boolean): StunMessage {
@@ -65,8 +65,7 @@ export class StunMessage {
   }
 
   setMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
-    this.attributes.set(
-      STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS,
+    this.attributes.push(
       new MappedAddressAttribute(rinfo.family, rinfo.port, rinfo.address),
     );
     return this;
@@ -78,10 +77,7 @@ export class StunMessage {
   }
 
   setUsernameAttribute(name: string): StunMessage {
-    this.attributes.set(
-      STUN_ATTRIBUTE_TYPE.USERNAME,
-      new UsernameAttribute(name),
-    );
+    this.attributes.push(new UsernameAttribute(name));
     return this;
   }
   getUsernameAttribute(): UsernamePayload | null {
@@ -89,8 +85,7 @@ export class StunMessage {
   }
 
   setXorMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
-    this.attributes.set(
-      STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS,
+    this.attributes.push(
       new XorMappedAddressAttribute(rinfo.family, rinfo.port, rinfo.address),
     );
     return this;
@@ -102,10 +97,7 @@ export class StunMessage {
   }
 
   setSoftwareAttribute(name: string): StunMessage {
-    this.attributes.set(
-      STUN_ATTRIBUTE_TYPE.SOFTWARE,
-      new SoftwareAttribute(name),
-    );
+    this.attributes.push(new SoftwareAttribute(name));
     return this;
   }
   getSoftwareAttribute(): SoftwarePayload | null {
@@ -142,6 +134,7 @@ export class StunMessage {
       return false;
     }
 
+    const loadedAttrType: Set<number> = new Set();
     // load attributes
     let offset = 0;
     while (offset < $body.length) {
@@ -159,7 +152,7 @@ export class StunMessage {
       offset += paddingByte;
 
       // skip duplicates
-      if (this.attributes.has(type)) {
+      if (loadedAttrType.has(type)) {
         continue;
       }
 
@@ -175,14 +168,16 @@ export class StunMessage {
         return false;
       }
 
-      this.attributes.set(type, attr);
+      this.attributes.push(attr);
+      // mark as loaded
+      loadedAttrType.add(type);
     }
 
     return true;
   }
 
   private getPayloadByType<T>(type: number): T | null {
-    const attr = this.attributes.get(type);
+    const attr = this.attributes.find(a => a.type === type);
     return attr !== undefined ? ((attr.payload as unknown) as T) : null;
   }
 

@@ -13,6 +13,10 @@ export class SoftwareAttribute {
 
   constructor(private name: string) {}
 
+  get type(): number {
+    return STUN_ATTRIBUTE_TYPE.SOFTWARE;
+  }
+
   get payload(): SoftwarePayload {
     return { name: this.name };
   }

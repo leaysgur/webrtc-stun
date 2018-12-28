@@ -37,6 +37,10 @@ export class MappedAddressAttribute {
     private address: string,
   ) {}
 
+  get type(): number {
+    return STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS;
+  }
+
   get payload(): MappedAddressPayload {
     return {
       family: this.family,

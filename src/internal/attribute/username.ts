@@ -13,6 +13,10 @@ export class UsernameAttribute {
 
   constructor(private name: string) {}
 
+  get type(): number {
+    return STUN_ATTRIBUTE_TYPE.USERNAME;
+  }
+
   get payload(): UsernamePayload {
     return { name: this.name };
   }
