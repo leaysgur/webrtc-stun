@@ -1,6 +1,7 @@
 import { RemoteInfo } from 'dgram';
 import {
   generateTransactionId,
+  generateHmacSha1Digest,
   numberToBinaryStringArray,
   calcPaddingByte,
 } from './internal/utils';
@@ -89,8 +90,16 @@ export class StunMessage {
     return this.getPayloadByType<UsernamePayload>(STUN_ATTRIBUTE_TYPE.USERNAME);
   }
 
-  setMessageIntegrityAttribute(key: string): StunMessage {
-    this.attributes.push(new MessageIntegrityAttribute(key));
+  setMessageIntegrityAttribute(integrityKey: string): StunMessage {
+    // first add with dummy to fix total length
+    const attr = new MessageIntegrityAttribute();
+    this.attributes.push(attr);
+
+    // without MESSAGE-INTEGRITY(header: 4byte + value: 20byte(sha1))
+    const $msg = this.toBuffer().slice(0, -24);
+    const $digest = generateHmacSha1Digest(integrityKey, $msg);
+    attr.loadBuffer($digest);
+
     return this;
   }
   getMessageIntegrityAttribute(): MessageIntegrityPayload | null {
@@ -128,7 +137,7 @@ export class StunMessage {
     return Buffer.concat([$header, $body]);
   }
 
-  loadBuffer($buffer: Buffer): boolean {
+  loadBuffer($buffer: Buffer, integrityKey?: string): boolean {
     // the first 2bit are 0 in first 1byte
     const first8bit = numberToBinaryStringArray($buffer[0], 8);
     if (!(first8bit[0] === '0' && first8bit[1] === '0')) {
@@ -186,6 +195,17 @@ export class StunMessage {
       this.attributes.push(attr);
       // mark as loaded
       loadedAttrType.add(type);
+    }
+
+    // check integrity if exists
+    const messageIntegrity = this.getMessageIntegrityAttribute();
+    if (messageIntegrity && integrityKey) {
+      // without MESSAGE-INTEGRITY(header: 4byte + value: 20byte(sha1))
+      const $msg = this.toBuffer().slice(0, -24);
+      const $digest = generateHmacSha1Digest(integrityKey, $msg);
+      if (!$digest.equals(messageIntegrity.value)) {
+        return false;
+      }
     }
 
     return true;

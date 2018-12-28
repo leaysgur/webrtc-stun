@@ -2,15 +2,19 @@ import { STUN_ATTRIBUTE_TYPE } from '../constants';
 import { writeAttrBuffer } from '../utils';
 
 export interface MessageIntegrityPayload {
-  value: string;
+  value: Buffer;
 }
 
 export class MessageIntegrityAttribute {
   static createBlank(): MessageIntegrityAttribute {
-    return new MessageIntegrityAttribute('');
+    return new MessageIntegrityAttribute();
   }
 
-  constructor(private value: string) {}
+  private value: Buffer;
+  constructor() {
+    // dummy, will be updated later
+    this.value = Buffer.alloc(20);
+  }
 
   get type(): number {
     return STUN_ATTRIBUTE_TYPE.MESSAGE_INTEGRITY;
@@ -23,12 +27,11 @@ export class MessageIntegrityAttribute {
   }
 
   toBuffer(): Buffer {
-    const $value = Buffer.from(this.value);
-    return writeAttrBuffer(STUN_ATTRIBUTE_TYPE.MESSAGE_INTEGRITY, $value);
+    return writeAttrBuffer(STUN_ATTRIBUTE_TYPE.MESSAGE_INTEGRITY, this.value);
   }
 
   loadBuffer($attr: Buffer): boolean {
-    console.log($attr);
+    $attr.copy(this.value);
     return true;
   }
 }
