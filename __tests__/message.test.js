@@ -218,7 +218,42 @@ describe('set / getUsernameAttribute()', () => {
   });
 });
 
-describe('set / getMessageIntegrityAttribute()', () => {});
+describe('set / getMessageIntegrityAttribute()', () => {
+  test('sets attr', () => {
+    const msg = StunMessage.createBindingRequest();
+    // save length w/o header
+    const len1 = msg.toBuffer().slice(20).length;
+
+    msg.setMessageIntegrityAttribute('dummy:integrity');
+    const len2 = msg.toBuffer().slice(20).length;
+    expect(len1).not.toBe(len2);
+  });
+
+  test('gets attr(from myself)', () => {
+    const msg = StunMessage.createBindingRequest();
+    expect(msg.getMessageIntegrityAttribute()).toBeNull();
+
+    msg.setMessageIntegrityAttribute('dummy:integrity');
+    expect(msg.getMessageIntegrityAttribute()).not.toBeNull();
+  });
+
+  test('gets attr(from buffer)', () => {
+    const msg = StunMessage.createBlank();
+    const buf = Buffer.from(
+      '0001' +
+      '0018' + // length = 24byte = `18` as hex
+      '2112a442' +
+      '999999999999999999999999' +
+      // MESSAGE-INTEGRITY
+      '0008' +
+      '0014' +
+      '9b3ec5409c692b9f13bac097b27231c2faee20d2',
+    'hex');
+
+    expect(msg.loadBuffer(buf)).toBeTruthy();
+    expect(msg.getMessageIntegrityAttribute()).not.toBeNull();
+  });
+});
 
 describe('toBuffer()', () => {
   test('extends length by adding attrs', () => {
@@ -232,14 +267,11 @@ describe('toBuffer()', () => {
 
     expect(len1).not.toBe(len2);
   });
-
-  test.skip('ignore duplicated attr', () => {});
 });
 
 describe('loadBuffer()', () => {
-  const blank = StunMessage.createBlank();
-
   test('returns true for valid buffer', () => {
+    const blank = StunMessage.createBlank();
     const buf = Buffer.from(
       '0001' +
       '0000' +
@@ -251,6 +283,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns true for valid buffer(valid attrs)', () => {
+    const blank = StunMessage.createBlank();
     const buf = Buffer.from(
       '0001' +
       '000c' + // length = 12byte = `c` as hex
@@ -266,6 +299,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns false for invalid buffer(first 2 bit is not 0)', () => {
+    const blank = StunMessage.createBlank();
     const buf = Buffer.from(
       '9001' +
       '0000' +
@@ -277,6 +311,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns false for invalid buffer(invalid header)', () => {
+    const blank = StunMessage.createBlank();
     const buf = Buffer.from(
       '0001' +
       '0000' +
@@ -288,6 +323,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns false for invalid buffer(wrong length)', () => {
+    const blank = StunMessage.createBlank();
     const buf = Buffer.from(
       '9001' +
       '0001' +
@@ -299,6 +335,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns false for invalid buffer(invalid attrs)', () => {
+    const blank = StunMessage.createBlank();
     const buf = Buffer.from(
       '0001' +
       '000c' + // length = 12byte = `c` as hex
@@ -313,5 +350,13 @@ describe('loadBuffer()', () => {
     expect(blank.loadBuffer(buf)).toBeFalsy();
   });
 
-  test.skip('ignore duplicated attr', () => {});
+  test('ignore duplicated attr', () => {
+    const msg = StunMessage.createBindingRequest()
+      .setSoftwareAttribute('test')
+      .setSoftwareAttribute('test2');
+
+    const blank = StunMessage.createBlank();
+    expect(blank.loadBuffer(msg.toBuffer())).toBeTruthy();
+    expect(blank.getSoftwareAttribute()).toEqual({ value: 'test' });
+  });
 });
