@@ -197,8 +197,6 @@ describe('set / getUsernameAttribute()', () => {
     expect(msg.getUsernameAttribute()).toBeNull();
 
     msg.setUsernameAttribute('dummy:user');
-    console.log(msg.toBuffer().slice(0, 20));
-    console.log(msg.toBuffer().slice(20));
     expect(msg.getUsernameAttribute()).toEqual({ value: 'dummy:user' });
   });
 
@@ -314,4 +312,6 @@ describe('loadBuffer()', () => {
 
     expect(blank.loadBuffer(buf)).toBeFalsy();
   });
+
+  test.skip('ignore duplicated attr', () => {});
 });
