@@ -25,7 +25,7 @@ describe('numberToBinaryStringArray()', () => {
 describe('calcPaddingByte()', () => {
   test('calcs pading', () => {
     const lim = 4;
-    patterns = [
+    [
       [0, 0],
       [1, 3], [2, 2], [3, 1], [4, 0],
       [5, 3], [16, 0],
@@ -54,7 +54,7 @@ describe('ipV4BufferToString() / ipV4StringToBuffer()', () => {
       '192.168.0.1',
     ].forEach(ip => {
       const from = utils.ipV4StringToBuffer(ip);
-      expect(utils.ipV4BufferToString(from)).toBe(ip)
+      expect(utils.ipV4BufferToString(from)).toBe(ip);
     });
   });
 });
