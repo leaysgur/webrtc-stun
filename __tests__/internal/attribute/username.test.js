@@ -18,3 +18,25 @@ describe('constructor()', () => {
     expect(attr.payload).toEqual({ value: 'myname' });
   });
 });
+
+describe('toBuffer()', () => {
+  test('returns buffer', () => {
+    const attr = new UsernameAttribute('test');
+
+    const $buf = Buffer.from(
+      '0006' + '0004' +
+      '74657374'
+    , 'hex');
+    expect(attr.toBuffer().equals($buf)).toBeTruthy();
+  });
+});
+
+describe('loadBuffer()', () => {
+  test('loads from buffer', () => {
+    const $buf = Buffer.from('74657374', 'hex');
+
+    const blank = UsernameAttribute.createBlank();
+    expect(blank.loadBuffer($buf)).toBeTruthy();
+    expect(blank.payload).toEqual({ value: 'test' });
+  });
+});
