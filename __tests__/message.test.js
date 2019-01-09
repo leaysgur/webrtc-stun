@@ -325,8 +325,8 @@ describe('loadBuffer()', () => {
   test('returns false for invalid buffer(wrong length)', () => {
     const blank = StunMessage.createBlank();
     const buf = Buffer.from(
-      '9001' +
       '0001' +
+      '0011' +
       '2112a442' +
       '999999999999999999999999',
     'hex');
