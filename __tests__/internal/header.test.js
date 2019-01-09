@@ -19,15 +19,15 @@ describe('constructor()', () => {
 
   test('has valid magicCookie as Buffer', () => {
     const { magicCookieAsBuffer } = header;
-    const mcBuf = Buffer.from('2112a442', 'hex');
-    expect(magicCookieAsBuffer.equals(mcBuf)).toBeTruthy();
+    const $mcBuf = Buffer.from('2112a442', 'hex');
+    expect(magicCookieAsBuffer.equals($mcBuf)).toBeTruthy();
     expect(magicCookieAsBuffer.length).toBe(4);
   });
 
   test('has valid transactionId as Buffer', () => {
     const { transactionIdAsBuffer } = header;
-    const tidBuf = Buffer.from(tid, 'hex');
-    expect(transactionIdAsBuffer.equals(tidBuf)).toBeTruthy();
+    const $tidBuf = Buffer.from(tid, 'hex');
+    expect(transactionIdAsBuffer.equals($tidBuf)).toBeTruthy();
     expect(transactionIdAsBuffer.length).toBe(12);
   });
 });
@@ -43,33 +43,30 @@ describe('loadBuffer()', () => {
   const header = new Header(0, '');
 
   test('returns true for valid buffer', () => {
-    const buf = Buffer.from(
-      '0001' +
-      '0000' +
+    const $buf = Buffer.from(
+      '0001' + '0000' +
       '2112a442' +
       '999999999999999999999999',
     'hex');
-    expect(header.loadBuffer(buf)).toBeTruthy();
+    expect(header.loadBuffer($buf)).toBeTruthy();
     expect(header.type).toBe(1);
   });
 
   test('returns false for invalid buffer(not supported type)', () => {
-    const buf = Buffer.from(
-      '1234' +
-      '0000' +
+    const $buf = Buffer.from(
+      '1234' + '0000' +
       '2112a442' +
       '999999999999999999999999',
     'hex');
-    expect(header.loadBuffer(buf)).toBeFalsy();
+    expect(header.loadBuffer($buf)).toBeFalsy();
   });
 
   test('returns false for invalid buffer(bad magicCookie)', () => {
-    const buf = Buffer.from(
-      '0001' +
-      '0000' +
+    const $buf = Buffer.from(
+      '0001' + '0000' +
       '88888888' +
       '999999999999999999999999',
     'hex');
-    expect(header.loadBuffer(buf)).toBeFalsy();
+    expect(header.loadBuffer($buf)).toBeFalsy();
   });
 });

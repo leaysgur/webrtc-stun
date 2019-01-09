@@ -47,8 +47,8 @@ describe('writeAttrBuffer()', () => {
       utils.writeAttrBuffer(1, Buffer.from('')),
       utils.writeAttrBuffer(1, Buffer.from('dummy')),
       utils.writeAttrBuffer(1, Buffer.from('dummy'.repeat(100))),
-    ].forEach(a => {
-      expect(a.length % 4).toBe(0);
+    ].forEach($attr => {
+      expect($attr.length % 4).toBe(0);
     });
   });
 });
@@ -59,8 +59,8 @@ describe('ipV4BufferToString() / ipV4StringToBuffer()', () => {
       '0.0.0.0',
       '192.168.0.1',
     ].forEach(ip => {
-      const from = utils.ipV4StringToBuffer(ip);
-      expect(utils.ipV4BufferToString(from)).toBe(ip);
+      const $from = utils.ipV4StringToBuffer(ip);
+      expect(utils.ipV4BufferToString($from)).toBe(ip);
     });
   });
 });
@@ -74,8 +74,8 @@ describe('ipV6BufferToString() / ipV6StringToBuffer()', () => {
       '0:0:0:0:0:0:0:0', '::',
       'ABCD:EF01:2345:6789:ABCD:EF01:2345:6789',
     ].forEach(ip => {
-      const from = utils.ipV6StringToBuffer(ip);
-      expect(utils.ipV6BufferToString(from)).toBe(ip);
+      const $from = utils.ipV6StringToBuffer(ip);
+      expect(utils.ipV6BufferToString($from)).toBe(ip);
     });
   });
 });

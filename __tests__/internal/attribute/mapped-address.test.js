@@ -29,11 +29,11 @@ describe('toBuffer()', () => {
     };
     const attr = new MappedAddressAttribute(rinfo.family, rinfo.port, rinfo.address);
 
-    const buf = Buffer.from(
+    const $buf = Buffer.from(
       '0001' + '0008' +
       '0001' + '3039' + 'c0a80004'
     , 'hex');
-    expect(attr.toBuffer().equals(buf)).toBeTruthy();
+    expect(attr.toBuffer().equals($buf)).toBeTruthy();
   });
 });
 
@@ -42,12 +42,12 @@ describe('loadBuffer()', () => {
     const rinfo = {
       family: 'IPv4', port: 12345, address: '192.168.0.4'
     };
-    const buf = Buffer.from(
+    const $buf = Buffer.from(
       '0001' + '3039' + 'c0a80004'
     , 'hex');
 
     const blank = MappedAddressAttribute.createBlank();
-    expect(blank.loadBuffer(buf)).toBeTruthy();
+    expect(blank.loadBuffer($buf)).toBeTruthy();
     expect(blank.payload).toEqual(rinfo);
   });
 });

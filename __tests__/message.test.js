@@ -87,18 +87,16 @@ describe('setMappedAddressAttribute() / getMappedAddressAttribute()', () => {
 
   test('gets attr(from buffer)', () => {
     const msg = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '000c' + // length = 12byte = `c` as hex
+    const $buf = Buffer.from(
+      '0001' + '000c' + // length = 12byte = `c` as hex
       '2112a442' +
       '999999999999999999999999' +
       // MAPPED-ADDRESS
-      '0001' +
-      '0008' +
-      '0001303900000000',
+      '0001' + '0008' +
+      '0001' + '3039' + '00000000',
     'hex');
 
-    expect(msg.loadBuffer(buf)).toBeTruthy();
+    expect(msg.loadBuffer($buf)).toBeTruthy();
     expect(msg.getMappedAddressAttribute()).toEqual(rinfo);
   });
 });
@@ -128,18 +126,16 @@ describe('set / getXorMappedAddressAttribute()', () => {
 
   test('gets attr(from buffer)', () => {
     const msg = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '000c' + // length = 12byte = `c` as hex
+    const $buf = Buffer.from(
+      '0001' + '000c' + // length = 12byte = `c` as hex
       '2112a442' +
       '999999999999999999999999' +
       // XOR-MAPPED-ADDRESS
-      '0020' +
-      '0008' +
-      '0001112b2112a442',
+      '0020' + '0008' +
+      '0001' + '112b' + '2112a442',
     'hex');
 
-    expect(msg.loadBuffer(buf)).toBeTruthy();
+    expect(msg.loadBuffer($buf)).toBeTruthy();
     expect(msg.getXorMappedAddressAttribute()).toEqual(rinfo);
   });
 });
@@ -165,18 +161,16 @@ describe('set / getSoftwareAttribute()', () => {
 
   test('gets attr(from buffer)', () => {
     const msg = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '000c' + // length = 12byte = `c` as hex
+    const $buf = Buffer.from(
+      '0001' + '000c' + // length = 12byte = `c` as hex
       '2112a442' +
       '999999999999999999999999' +
       // SOFTWARE
-      '8022' +
-      '0005' +
+      '8022' + '0005' +
       '64756d6d79000000',
     'hex');
 
-    expect(msg.loadBuffer(buf)).toBeTruthy();
+    expect(msg.loadBuffer($buf)).toBeTruthy();
     expect(msg.getSoftwareAttribute()).toEqual({ value: 'dummy' });
   });
 });
@@ -202,18 +196,16 @@ describe('set / getUsernameAttribute()', () => {
 
   test('gets attr(from buffer)', () => {
     const msg = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '0010' + // length = 16byte = `10` as hex
+    const $buf = Buffer.from(
+      '0001' + '0010' + // length = 16byte = `10` as hex
       '2112a442' +
       '999999999999999999999999' +
       // USERNAME
-      '0006' +
-      '000a' +
+      '0006' + '000a' +
       '64756d6d793a757365720000',
     'hex');
 
-    expect(msg.loadBuffer(buf)).toBeTruthy();
+    expect(msg.loadBuffer($buf)).toBeTruthy();
     expect(msg.getUsernameAttribute()).toEqual({ value: 'dummy:user' });
   });
 });
@@ -239,18 +231,16 @@ describe('set / getMessageIntegrityAttribute()', () => {
 
   test('gets attr(from buffer)', () => {
     const msg = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '0018' + // length = 24byte = `18` as hex
+    const $buf = Buffer.from(
+      '0001' + '0018' + // length = 24byte = `18` as hex
       '2112a442' +
       '999999999999999999999999' +
       // MESSAGE-INTEGRITY
-      '0008' +
-      '0014' +
+      '0008' + '0014' +
       '9b3ec5409c692b9f13bac097b27231c2faee20d2',
     'hex');
 
-    expect(msg.loadBuffer(buf)).toBeTruthy();
+    expect(msg.loadBuffer($buf)).toBeTruthy();
     expect(msg.getMessageIntegrityAttribute()).not.toBeNull();
   });
 });
@@ -272,82 +262,74 @@ describe('toBuffer()', () => {
 describe('loadBuffer()', () => {
   test('returns true for valid buffer', () => {
     const blank = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '0000' +
+    const $buf = Buffer.from(
+      '0001' + '0000' +
       '2112a442' +
       '999999999999999999999999',
     'hex');
 
-    expect(blank.loadBuffer(buf)).toBeTruthy();
+    expect(blank.loadBuffer($buf)).toBeTruthy();
   });
 
   test('returns true for valid buffer(valid attrs)', () => {
     const blank = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '000c' + // length = 12byte = `c` as hex
+    const $buf = Buffer.from(
+      '0001' + '000c' + // length = 12byte = `c` as hex
       '2112a442' +
       '999999999999999999999999' +
       // MAPPED-ADDRESS
-      '0001' +
-      '0008' +
-      '0001303900000000',
+      '0001' + '0008' +
+      '0001' + '3039' + '00000000',
     'hex');
 
-    expect(blank.loadBuffer(buf)).toBeTruthy();
+    expect(blank.loadBuffer($buf)).toBeTruthy();
   });
 
   test('returns false for invalid buffer(first 2 bit is not 0)', () => {
     const blank = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '9001' +
-      '0000' +
+    const $buf = Buffer.from(
+      '9001' + '0000' +
       '2112a442' +
       '999999999999999999999999',
     'hex');
 
-    expect(blank.loadBuffer(buf)).toBeFalsy();
+    expect(blank.loadBuffer($buf)).toBeFalsy();
   });
 
   test('returns false for invalid buffer(invalid header)', () => {
     const blank = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '0000' +
+    const $buf = Buffer.from(
+      '0001' + '0000' +
       '88888888' +
       '999999999999999999999999',
     'hex');
 
-    expect(blank.loadBuffer(buf)).toBeFalsy();
+    expect(blank.loadBuffer($buf)).toBeFalsy();
   });
 
   test('returns false for invalid buffer(wrong length)', () => {
     const blank = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '0011' +
+    const $buf = Buffer.from(
+      '0001' + '0011' +
       '2112a442' +
       '999999999999999999999999',
     'hex');
 
-    expect(blank.loadBuffer(buf)).toBeFalsy();
+    expect(blank.loadBuffer($buf)).toBeFalsy();
   });
 
   test('returns false for invalid buffer(invalid attrs)', () => {
     const blank = StunMessage.createBlank();
-    const buf = Buffer.from(
-      '0001' +
-      '000c' + // length = 12byte = `c` as hex
+    const $buf = Buffer.from(
+      '0001' + '000c' + // length = 12byte = `c` as hex
       '2112a442' +
       '999999999999999999999999' +
       // MAPPED-ADDRESS
-      '0001' +
-      '0000' + // invalid length
-      '0001303900000000',
+      '0001' + '0000' + // invalid length
+      '0001' + '3039' + '00000000',
     'hex');
 
-    expect(blank.loadBuffer(buf)).toBeFalsy();
+    expect(blank.loadBuffer($buf)).toBeFalsy();
   });
 
   test('ignore duplicated attr', () => {
