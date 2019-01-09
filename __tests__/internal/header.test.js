@@ -1,9 +1,8 @@
 const { Header } = require('../../lib/internal/header');
-const { generateTransactionId } = require('../../lib/internal/utils');
 
 describe('constructor()', () => {
   const type = 1;
-  const tid = generateTransactionId();
+  const tid = '999999999999999999999999';
   const header = new Header(type, tid);
 
   test('has passed type', () => {
@@ -41,7 +40,7 @@ describe('toBuffer()', () => {
 });
 
 describe('loadBuffer()', () => {
-  const header = new Header(0, generateTransactionId());
+  const header = new Header(0, '');
 
   test('returns true for valid buffer', () => {
     const buf = Buffer.from(
