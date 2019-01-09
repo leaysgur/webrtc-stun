@@ -40,4 +40,21 @@ describe('loadBuffer()', () => {
     expect(blank.loadBuffer($buf)).toBeTruthy();
     expect(blank.payload.value.equals($buf)).toBeTruthy();
   });
+
+  test('does not update length', () => {
+    const blank = MessageIntegrityAttribute.createBlank();
+    expect(blank.payload.value.length).toBe(20);
+
+    const $buf1 = Buffer.from('0000000000000000000000000000000000000000', 'hex');
+    expect(blank.loadBuffer($buf1)).toBeTruthy();
+    expect(blank.payload.value.length).toBe(20);
+
+    const $buf2 = Buffer.from('00000000000000000000000000000000000000000000000000000000000000000000000000000000', 'hex');
+    expect(blank.loadBuffer($buf2)).toBeTruthy();
+    expect(blank.payload.value.length).toBe(20);
+
+    const $buf3 = Buffer.from('', 'hex');
+    expect(blank.loadBuffer($buf3)).toBeTruthy();
+    expect(blank.payload.value.length).toBe(20);
+  });
 });
