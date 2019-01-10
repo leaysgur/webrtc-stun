@@ -56,6 +56,7 @@ export class StunMessage {
     const type = isSuccess
       ? STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS
       : STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR;
+    // send back same id for transaction
     const tid = this.header.transactionId;
     return new StunMessage(new Header(type, tid));
   }
@@ -164,6 +165,11 @@ export class StunMessage {
 
       const length = $body.readUInt16BE(offset);
       offset += 2; // 16bit = 2byte
+
+      // do not allow empty attr
+      if (length === 0) {
+        return false;
+      }
 
       const $value = $body.slice(offset, offset + length);
       offset += $value.length;
