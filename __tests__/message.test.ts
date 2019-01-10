@@ -1,4 +1,4 @@
-import { StunMessage } from '../lib/message';
+import { StunMessage } from '../src/message';
 
 describe('static createBlank()', () => {
   test('creates blank instance', () => {

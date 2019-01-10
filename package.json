@@ -19,7 +19,10 @@
     "tslint-plugin-prettier": "^2.0.1",
     "typescript": "^3.2.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@types/ip": "^1.1.0",
+    "ip": "^1.1.5"
+  },
   "scripts": {
     "test": "jest",
     "lint": "tslint -p . --fix && tsc -p . --noEmit",

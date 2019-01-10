@@ -1,13 +1,25 @@
-import { randomBytes, createHmac } from 'crypto';
-
-export function generateTransactionId(): string {
-  return randomBytes(12).toString('hex');
+export function isStunMessage($buffer: Buffer): boolean {
+  // the first 2bit must be 0 in first 1byte
+  const first8bit = numberToBinaryStringArray($buffer[0], 8);
+  if (first8bit[0] === '0' && first8bit[1] === '0') {
+    return true;
+  }
+  return false;
 }
 
-export function generateHmacSha1Digest(key: string, $buf: Buffer): Buffer {
-  return createHmac('sha1', key)
-    .update($buf)
-    .digest();
+/**
+ * The toString for bit operation
+ *
+ * (1, 4) -> [0, 0, 0, 1]
+ * (10, 4) -> [1, 0, 1, 0]
+ * (257, 8) -> [1, 0, 0, 0, 0, 0, 0, 1]
+ */
+export function numberToBinaryStringArray(
+  num: number,
+  digit: number = 0,
+): string[] {
+  const binStr = num.toString(2).padStart(digit, '0');
+  return binStr.split('');
 }
 
 /**
@@ -76,21 +88,6 @@ export function methodAndClassToMessageType([method, klass]: [
 }
 
 /**
- * The toString for bit operation
- *
- * (1, 4) -> [0, 0, 0, 1]
- * (10, 4) -> [1, 0, 1, 0]
- * (257, 8) -> [0, 0, 0, 0, 0, 1, 0, 1]
- */
-export function numberToBinaryStringArray(
-  num: number,
-  digit: number = 0,
-): string[] {
-  const binStr = num.toString(2).padStart(digit, '0');
-  return binStr.split('');
-}
-
-/**
  * Calculate padding bytes
  *
  * (2, 4) -> 2
@@ -103,18 +100,6 @@ export function calcPaddingByte(curByte: number, boundaryByte: number): number {
   const paddingByte =
     missingBoundaryByte === 0 ? 0 : boundaryByte - missingBoundaryByte;
   return paddingByte;
-}
-
-export function bufferXor(a: Buffer, b: Buffer): Buffer {
-  // a and b should have same length
-  const length = a.length;
-  const buffer = Buffer.allocUnsafe(length);
-
-  for (let i = 0; i < length; i++) {
-    buffer[i] = a[i] ^ b[i];
-  }
-
-  return buffer;
 }
 
 export function writeAttrBuffer(type: number, $value: Buffer): Buffer {
@@ -130,36 +115,4 @@ export function writeAttrBuffer(type: number, $value: Buffer): Buffer {
   const $padding = Buffer.alloc(paddingByte);
 
   return Buffer.concat([$type, $length, $value, $padding]);
-}
-
-export function ipV4BufferToString($ip: Buffer): string {
-  const res = [];
-  for (const digit of $ip) {
-    res.push(digit.toString());
-  }
-  return res.join('.');
-}
-export function ipV4StringToBuffer(ip: string): Buffer {
-  const res = Buffer.alloc(4);
-  let idx = 0;
-  for (const digit of ip.split('.')) {
-    res[idx] = parseInt(digit, 10);
-    idx++;
-  }
-  return res;
-}
-
-export function ipV6BufferToString($ip: Buffer): string {
-  const res = [];
-  for (let i = 0; i < $ip.length; i += 2) {
-    res.push($ip.readUInt16BE(i).toString(16));
-  }
-  return res
-    .join(':')
-    .replace(/(^|:)0(:0)*:0(:|$)/, '$1::$3')
-    .replace(/:{3,4}/, '::');
-}
-export function ipV6StringToBuffer(ip: string): Buffer {
-  // TODO: impl
-  return Buffer.from(ip);
 }

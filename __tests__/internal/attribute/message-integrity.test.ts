@@ -1,4 +1,4 @@
-import { MessageIntegrityAttribute } from '../../../lib/internal/attribute/message-integrity';
+import { MessageIntegrityAttribute } from '../../../src/internal/attribute/message-integrity';
 
 describe('static createBlank()', () => {
   test('create blank instance', () => {

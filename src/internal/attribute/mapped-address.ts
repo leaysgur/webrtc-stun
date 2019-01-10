@@ -1,11 +1,6 @@
+import * as nodeIp from 'ip';
 import { STUN_ATTRIBUTE_TYPE } from '../constants';
-import {
-  writeAttrBuffer,
-  ipV4BufferToString,
-  ipV4StringToBuffer,
-  ipV6BufferToString,
-  ipV6StringToBuffer,
-} from '../utils';
+import { writeAttrBuffer } from '../utils';
 
 export interface MappedAddressPayload {
   family: string;
@@ -54,13 +49,10 @@ export class MappedAddressAttribute {
 
     const $port = Buffer.alloc(2);
     $port.writeUInt16BE(this.port, 0);
-    const $address =
-      this.family === 'IPv4'
-        ? ipV4StringToBuffer(this.address)
-        : ipV6StringToBuffer(this.address);
+
+    const $address = nodeIp.toBuffer(this.address);
 
     const $value = Buffer.concat([$family, $port, $address]);
-
     return writeAttrBuffer(STUN_ATTRIBUTE_TYPE.MAPPED_ADDRESS, $value);
   }
 
@@ -71,10 +63,7 @@ export class MappedAddressAttribute {
     this.port = $attr.readUInt16BE(2);
 
     const $address = family === 0x01 ? $attr.slice(4, 8) : $attr.slice(4, 20);
-    this.address =
-      family === 0x01
-        ? ipV4BufferToString($address)
-        : ipV6BufferToString($address);
+    this.address = nodeIp.toString($address);
 
     return true;
   }
