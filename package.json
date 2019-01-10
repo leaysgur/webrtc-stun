@@ -1,6 +1,6 @@
 {
   "name": "webrtc-stun",
-  "version": "0.1.5",
+  "version": "1.0.0",
   "description": "Pure TypeScript STUN implementation.",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
