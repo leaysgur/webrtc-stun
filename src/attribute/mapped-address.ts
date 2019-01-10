@@ -22,7 +22,7 @@ export interface MappedAddressPayload {
  */
 export class MappedAddressAttribute {
   static createBlank(): MappedAddressAttribute {
-    return new MappedAddressAttribute('', -1, '');
+    return new MappedAddressAttribute('', 0, '');
   }
 
   constructor(

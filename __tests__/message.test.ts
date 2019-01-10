@@ -1,28 +1,15 @@
+import * as stun from '../src';
 import { StunMessage } from '../src/message';
-
-describe('static createBlank()', () => {
-  test('creates blank instance', () => {
-    const blank = StunMessage.createBlank();
-    expect(blank).toBeInstanceOf(StunMessage);
-  });
-});
-
-describe('static createBindingRequest()', () => {
-  test('creates request', () => {
-    const msg = StunMessage.createBindingRequest();
-    expect(msg).toBeInstanceOf(StunMessage);
-  });
-});
 
 describe('createBindingResponse()', () => {
   test('creates success response from request', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     const res = msg.createBindingResponse(true);
     expect(res).toBeInstanceOf(StunMessage);
   });
 
   test('has same transactionId w/ request', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     const res = msg.createBindingResponse(true);
 
     expect(
@@ -36,18 +23,18 @@ describe('createBindingResponse()', () => {
 
 describe('isBindingRequest()', () => {
   test('returns true for request', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     expect(msg.isBindingRequest()).toBeTruthy();
   });
 
   test('returns false for blank', () => {
-    const blank = StunMessage.createBlank();
+    const blank = stun.createBlank();
     expect(blank.isBindingRequest()).toBeFalsy();
   });
 });
 
 describe('isBindingResponseSuccess()', () => {
-  const msg = StunMessage.createBindingRequest();
+  const msg = stun.createBindingRequest();
 
   test('returns true for success response', () => {
     const res = msg.createBindingResponse(true);
@@ -60,8 +47,13 @@ describe('isBindingResponseSuccess()', () => {
   });
 
   test('returns false for blank', () => {
-    const blank = StunMessage.createBlank();
+    const blank = stun.createBlank();
     expect(blank.isBindingResponseSuccess()).toBeFalsy();
+  });
+
+  test('returns false for invalid transactionId', () => {
+    const res = msg.createBindingResponse(true);
+    expect(res.isBindingResponseSuccess('invalid-tid')).toBeFalsy();
   });
 });
 
@@ -73,7 +65,7 @@ describe('setMappedAddressAttribute() / getMappedAddressAttribute()', () => {
   };
 
   test('sets attr', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     // save length w/o header
     const len1 = msg.toBuffer().slice(20).length;
 
@@ -83,7 +75,7 @@ describe('setMappedAddressAttribute() / getMappedAddressAttribute()', () => {
   });
 
   test('gets attr(from myself)', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     expect(msg.getMappedAddressAttribute()).toBeNull();
 
     msg.setMappedAddressAttribute(rinfo);
@@ -91,7 +83,7 @@ describe('setMappedAddressAttribute() / getMappedAddressAttribute()', () => {
   });
 
   test('gets attr(from buffer)', () => {
-    const msg = StunMessage.createBlank();
+    const msg = stun.createBlank();
     const $buf = Buffer.from(
       '0001' +
       '000c' + // length = 12byte = `c` as hex
@@ -119,7 +111,7 @@ describe('set / getXorMappedAddressAttribute()', () => {
   };
 
   test('sets attr', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     // save length w/o header
     const len1 = msg.toBuffer().slice(20).length;
 
@@ -129,7 +121,7 @@ describe('set / getXorMappedAddressAttribute()', () => {
   });
 
   test('gets attr(from myself)', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     expect(msg.getXorMappedAddressAttribute()).toBeNull();
 
     msg.setXorMappedAddressAttribute(rinfo);
@@ -137,7 +129,7 @@ describe('set / getXorMappedAddressAttribute()', () => {
   });
 
   test('gets attr(from buffer)', () => {
-    const msg = StunMessage.createBlank();
+    const msg = stun.createBlank();
     const $buf = Buffer.from(
       '0001' +
       '000c' + // length = 12byte = `c` as hex
@@ -159,7 +151,7 @@ describe('set / getXorMappedAddressAttribute()', () => {
 
 describe('set / getSoftwareAttribute()', () => {
   test('sets attr', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     // save length w/o header
     const len1 = msg.toBuffer().slice(20).length;
 
@@ -169,7 +161,7 @@ describe('set / getSoftwareAttribute()', () => {
   });
 
   test('gets attr(from myself)', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     expect(msg.getSoftwareAttribute()).toBeNull();
 
     msg.setSoftwareAttribute('dummy');
@@ -177,7 +169,7 @@ describe('set / getSoftwareAttribute()', () => {
   });
 
   test('gets attr(from buffer)', () => {
-    const msg = StunMessage.createBlank();
+    const msg = stun.createBlank();
     const $buf = Buffer.from(
       '0001' +
       '000c' + // length = 12byte = `c` as hex
@@ -197,7 +189,7 @@ describe('set / getSoftwareAttribute()', () => {
 
 describe('set / getUsernameAttribute()', () => {
   test('sets attr', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     // save length w/o header
     const len1 = msg.toBuffer().slice(20).length;
 
@@ -207,7 +199,7 @@ describe('set / getUsernameAttribute()', () => {
   });
 
   test('gets attr(from myself)', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     expect(msg.getUsernameAttribute()).toBeNull();
 
     msg.setUsernameAttribute('dummy:user');
@@ -215,7 +207,7 @@ describe('set / getUsernameAttribute()', () => {
   });
 
   test('gets attr(from buffer)', () => {
-    const msg = StunMessage.createBlank();
+    const msg = stun.createBlank();
     const $buf = Buffer.from(
       '0001' +
       '0010' + // length = 16byte = `10` as hex
@@ -235,7 +227,7 @@ describe('set / getUsernameAttribute()', () => {
 
 describe('set / getMessageIntegrityAttribute()', () => {
   test('sets attr', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     // save length w/o header
     const len1 = msg.toBuffer().slice(20).length;
 
@@ -245,7 +237,7 @@ describe('set / getMessageIntegrityAttribute()', () => {
   });
 
   test('gets attr(from myself)', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     expect(msg.getMessageIntegrityAttribute()).toBeNull();
 
     msg.setMessageIntegrityAttribute('dummy:integrity');
@@ -253,7 +245,7 @@ describe('set / getMessageIntegrityAttribute()', () => {
   });
 
   test('gets attr(from buffer)', () => {
-    const msg = StunMessage.createBlank();
+    const msg = stun.createBlank();
     const $buf = Buffer.from(
       '0001' +
       '0018' + // length = 24byte = `18` as hex
@@ -273,7 +265,7 @@ describe('set / getMessageIntegrityAttribute()', () => {
 
 describe('toBuffer()', () => {
   test('extends length by adding attrs', () => {
-    const msg = StunMessage.createBindingRequest();
+    const msg = stun.createBindingRequest();
     const len1 = msg.toBuffer().length;
 
     msg.setSoftwareAttribute('test').setUsernameAttribute('test:user');
@@ -285,7 +277,7 @@ describe('toBuffer()', () => {
 
 describe('loadBuffer()', () => {
   test('returns true for valid buffer', () => {
-    const blank = StunMessage.createBlank();
+    const blank = stun.createBlank();
     const $buf = Buffer.from(
       '0001' + '0000' + '2112a442' + '999999999999999999999999',
       'hex',
@@ -295,7 +287,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns true for valid buffer(valid attrs)', () => {
-    const blank = StunMessage.createBlank();
+    const blank = stun.createBlank();
     const $buf = Buffer.from(
       '0001' +
       '000c' + // length = 12byte = `c` as hex
@@ -314,7 +306,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns false for invalid buffer(first 2 bit is not 0)', () => {
-    const blank = StunMessage.createBlank();
+    const blank = stun.createBlank();
     const $buf = Buffer.from(
       '9001' + '0000' + '2112a442' + '999999999999999999999999',
       'hex',
@@ -324,7 +316,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns false for invalid buffer(invalid header)', () => {
-    const blank = StunMessage.createBlank();
+    const blank = stun.createBlank();
     const $buf = Buffer.from(
       '0001' + '0000' + '88888888' + '999999999999999999999999',
       'hex',
@@ -334,7 +326,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns false for invalid buffer(wrong length)', () => {
-    const blank = StunMessage.createBlank();
+    const blank = stun.createBlank();
     const $buf = Buffer.from(
       '0001' + '0011' + '2112a442' + '999999999999999999999999',
       'hex',
@@ -344,7 +336,7 @@ describe('loadBuffer()', () => {
   });
 
   test('returns false for invalid buffer(invalid attrs)', () => {
-    const blank = StunMessage.createBlank();
+    const blank = stun.createBlank();
     const $buf = Buffer.from(
       '0001' +
       '000c' + // length = 12byte = `c` as hex
@@ -363,11 +355,12 @@ describe('loadBuffer()', () => {
   });
 
   test('ignore duplicated attr', () => {
-    const msg = StunMessage.createBindingRequest()
+    const msg = stun
+      .createBindingRequest()
       .setSoftwareAttribute('test')
       .setSoftwareAttribute('test2');
 
-    const blank = StunMessage.createBlank();
+    const blank = stun.createBlank();
     expect(blank.loadBuffer(msg.toBuffer())).toBeTruthy();
     expect(blank.getSoftwareAttribute()).toEqual({ value: 'test' });
   });

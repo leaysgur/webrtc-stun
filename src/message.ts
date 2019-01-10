@@ -1,32 +1,25 @@
 import { RemoteInfo } from 'dgram';
 import {
   isStunMessage,
-  generateTransactionId,
   generateHmacSha1Digest,
   calcPaddingByte,
-} from './internal/utils';
-import { Header } from './internal/header';
+} from './utils';
+import { Header } from './header';
 import {
   MappedAddressAttribute,
   MappedAddressPayload,
-} from './internal/attribute/mapped-address';
-import {
-  UsernameAttribute,
-  UsernamePayload,
-} from './internal/attribute/username';
+} from './attribute/mapped-address';
+import { UsernameAttribute, UsernamePayload } from './attribute/username';
 import {
   MessageIntegrityAttribute,
   MessageIntegrityPayload,
-} from './internal/attribute/message-integrity';
+} from './attribute/message-integrity';
 import {
   XorMappedAddressAttribute,
   XorMappedAddressPayload,
-} from './internal/attribute/xor-mapped-address';
-import {
-  SoftwareAttribute,
-  SoftwarePayload,
-} from './internal/attribute/software';
-import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './internal/constants';
+} from './attribute/xor-mapped-address';
+import { SoftwareAttribute, SoftwarePayload } from './attribute/software';
+import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './constants';
 
 type Attribute =
   | MappedAddressAttribute
@@ -36,15 +29,6 @@ type Attribute =
   | SoftwareAttribute;
 
 export class StunMessage {
-  static createBlank(): StunMessage {
-    return new StunMessage(new Header(-1, generateTransactionId()));
-  }
-  static createBindingRequest(): StunMessage {
-    return new StunMessage(
-      new Header(STUN_MESSAGE_TYPE.BINDING_REQUEST, generateTransactionId()),
-    );
-  }
-
   private header: Header;
   private attributes: Attribute[];
   constructor(header: Header) {
@@ -64,8 +48,15 @@ export class StunMessage {
   isBindingRequest(): boolean {
     return this.header.type === STUN_MESSAGE_TYPE.BINDING_REQUEST;
   }
-  isBindingResponseSuccess(): boolean {
-    return this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS;
+  isBindingResponseSuccess(tid?: string): boolean {
+    const isSuccessResp =
+      this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS;
+
+    if (!tid) {
+      return isSuccessResp;
+    }
+    const isValidTransactionId = this.header.transactionId === tid;
+    return isSuccessResp && isValidTransactionId;
   }
 
   setMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
