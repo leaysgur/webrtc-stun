@@ -1,4 +1,4 @@
-const { MessageIntegrityAttribute } = require('../../../lib/internal/attribute/message-integrity');
+import { MessageIntegrityAttribute } from '../../../lib/internal/attribute/message-integrity';
 
 describe('static createBlank()', () => {
   test('create blank instance', () => {
@@ -25,9 +25,9 @@ describe('toBuffer()', () => {
     const attr = new MessageIntegrityAttribute();
 
     const $buf = Buffer.from(
-      '0008' + '0014' +
-      '0000000000000000000000000000000000000000'
-    , 'hex');
+      '0008' + '0014' + '0000000000000000000000000000000000000000',
+      'hex',
+    );
     expect(attr.toBuffer().equals($buf)).toBeTruthy();
   });
 });
@@ -45,11 +45,17 @@ describe('loadBuffer()', () => {
     const blank = MessageIntegrityAttribute.createBlank();
     expect(blank.payload.value.length).toBe(20);
 
-    const $buf1 = Buffer.from('0000000000000000000000000000000000000000', 'hex');
+    const $buf1 = Buffer.from(
+      '0000000000000000000000000000000000000000',
+      'hex',
+    );
     expect(blank.loadBuffer($buf1)).toBeTruthy();
     expect(blank.payload.value.length).toBe(20);
 
-    const $buf2 = Buffer.from('00000000000000000000000000000000000000000000000000000000000000000000000000000000', 'hex');
+    const $buf2 = Buffer.from(
+      '00000000000000000000000000000000000000000000000000000000000000000000000000000000',
+      'hex',
+    );
     expect(blank.loadBuffer($buf2)).toBeTruthy();
     expect(blank.payload.value.length).toBe(20);
 

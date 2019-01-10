@@ -1,4 +1,4 @@
-const { Header } = require('../../lib/internal/header');
+import { Header } from '../../lib/internal/header';
 
 describe('constructor()', () => {
   const type = 1;
@@ -44,29 +44,26 @@ describe('loadBuffer()', () => {
 
   test('returns true for valid buffer', () => {
     const $buf = Buffer.from(
-      '0001' + '0000' +
-      '2112a442' +
-      '999999999999999999999999',
-    'hex');
+      '0001' + '0000' + '2112a442' + '999999999999999999999999',
+      'hex',
+    );
     expect(header.loadBuffer($buf)).toBeTruthy();
     expect(header.type).toBe(1);
   });
 
   test('returns false for invalid buffer(not supported type)', () => {
     const $buf = Buffer.from(
-      '1234' + '0000' +
-      '2112a442' +
-      '999999999999999999999999',
-    'hex');
+      '1234' + '0000' + '2112a442' + '999999999999999999999999',
+      'hex',
+    );
     expect(header.loadBuffer($buf)).toBeFalsy();
   });
 
   test('returns false for invalid buffer(bad magicCookie)', () => {
     const $buf = Buffer.from(
-      '0001' + '0000' +
-      '88888888' +
-      '999999999999999999999999',
-    'hex');
+      '0001' + '0000' + '88888888' + '999999999999999999999999',
+      'hex',
+    );
     expect(header.loadBuffer($buf)).toBeFalsy();
   });
 });

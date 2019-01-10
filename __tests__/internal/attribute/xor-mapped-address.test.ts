@@ -1,5 +1,5 @@
-const { XorMappedAddressAttribute } = require('../../../lib/internal/attribute/xor-mapped-address');
-const { Header } = require('../../../lib/internal/header');
+import { XorMappedAddressAttribute } from '../../../lib/internal/attribute/xor-mapped-address';
+import { Header } from '../../../lib/internal/header';
 
 describe('static createBlank()', () => {
   test('create blank instance', () => {
@@ -10,9 +10,15 @@ describe('static createBlank()', () => {
 
 describe('constructor()', () => {
   const rinfo = {
-    family: 'IPv4', port: 12345, address: '0.0.0.0'
+    family: 'IPv4',
+    port: 12345,
+    address: '0.0.0.0',
   };
-  const attr = new XorMappedAddressAttribute(rinfo.family, rinfo.port, rinfo.address);
+  const attr = new XorMappedAddressAttribute(
+    rinfo.family,
+    rinfo.port,
+    rinfo.address,
+  );
 
   test('has type', () => {
     expect(attr.type).toBe(0x0020);
@@ -28,14 +34,20 @@ describe('toBuffer()', () => {
 
   test('returns buffer from IPv4', () => {
     const rinfo = {
-      family: 'IPv4', port: 12345, address: '192.168.0.4'
+      family: 'IPv4',
+      port: 12345,
+      address: '192.168.0.4',
     };
-    const attr = new XorMappedAddressAttribute(rinfo.family, rinfo.port, rinfo.address);
+    const attr = new XorMappedAddressAttribute(
+      rinfo.family,
+      rinfo.port,
+      rinfo.address,
+    );
 
     const $buf = Buffer.from(
-      '0020' + '0008' +
-      '0001' + '112b' + 'e1baa446'
-    , 'hex');
+      '0020' + '0008' + '0001' + '112b' + 'e1baa446',
+      'hex',
+    );
     expect(attr.toBuffer(header).equals($buf)).toBeTruthy();
   });
 });
@@ -45,11 +57,11 @@ describe('loadBuffer()', () => {
 
   test('loads from IPv4 buffer', () => {
     const rinfo = {
-      family: 'IPv4', port: 12345, address: '192.168.0.4'
+      family: 'IPv4',
+      port: 12345,
+      address: '192.168.0.4',
     };
-    const $buf = Buffer.from(
-      '0001' + '112b' + 'e1baa446'
-    , 'hex');
+    const $buf = Buffer.from('0001' + '112b' + 'e1baa446', 'hex');
 
     const blank = XorMappedAddressAttribute.createBlank();
     expect(blank.loadBuffer($buf, header)).toBeTruthy();

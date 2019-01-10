@@ -1,32 +1,29 @@
-const { SoftwareAttribute } = require('../../../lib/internal/attribute/software');
+import { UsernameAttribute } from '../../../lib/internal/attribute/username';
 
 describe('static createBlank()', () => {
   test('create blank instance', () => {
-    const blank = SoftwareAttribute.createBlank();
-    expect(blank).toBeInstanceOf(SoftwareAttribute);
+    const blank = UsernameAttribute.createBlank();
+    expect(blank).toBeInstanceOf(UsernameAttribute);
   });
 });
 
 describe('constructor()', () => {
-  const attr = new SoftwareAttribute('hello');
+  const attr = new UsernameAttribute('myname');
 
   test('has type', () => {
-    expect(attr.type).toBe(0x8022);
+    expect(attr.type).toBe(0x0006);
   });
 
   test('has payload', () => {
-    expect(attr.payload).toEqual({ value: 'hello' });
+    expect(attr.payload).toEqual({ value: 'myname' });
   });
 });
 
 describe('toBuffer()', () => {
   test('returns buffer', () => {
-    const attr = new SoftwareAttribute('test');
+    const attr = new UsernameAttribute('test');
 
-    const $buf = Buffer.from(
-      '8022' + '0004' +
-      '74657374'
-    , 'hex');
+    const $buf = Buffer.from('0006' + '0004' + '74657374', 'hex');
     expect(attr.toBuffer().equals($buf)).toBeTruthy();
   });
 });
@@ -35,7 +32,7 @@ describe('loadBuffer()', () => {
   test('loads from buffer', () => {
     const $buf = Buffer.from('74657374', 'hex');
 
-    const blank = SoftwareAttribute.createBlank();
+    const blank = UsernameAttribute.createBlank();
     expect(blank.loadBuffer($buf)).toBeTruthy();
     expect(blank.payload).toEqual({ value: 'test' });
   });
