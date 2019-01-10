@@ -28,6 +28,11 @@ type Attribute =
   | XorMappedAddressAttribute
   | SoftwareAttribute;
 
+interface ValidationTarget {
+  transactionId?: string;
+  integrityKey?: string;
+}
+
 export class StunMessage {
   private header: Header;
   private attributes: Attribute[];
@@ -45,18 +50,30 @@ export class StunMessage {
     return new StunMessage(new Header(type, tid));
   }
 
-  isBindingRequest(): boolean {
-    return this.header.type === STUN_MESSAGE_TYPE.BINDING_REQUEST;
+  isBindingRequest(vt?: ValidationTarget): boolean {
+    const isRequest = this.header.type === STUN_MESSAGE_TYPE.BINDING_REQUEST;
+    let hasValidIntegrity = true;
+
+    if (vt && vt.integrityKey) {
+      hasValidIntegrity = this.validateMessageIntegrity(vt.integrityKey);
+    }
+
+    return isRequest && hasValidIntegrity;
   }
-  isBindingResponseSuccess(tid?: string): boolean {
+  isBindingResponseSuccess(vt?: ValidationTarget): boolean {
     const isSuccessResp =
       this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS;
+    let hasValidTransactionId = true;
+    let hasValidIntegrity = true;
 
-    if (!tid) {
-      return isSuccessResp;
+    if (vt && vt.transactionId) {
+      hasValidTransactionId = this.header.transactionId === vt.transactionId;
     }
-    const isValidTransactionId = this.header.transactionId === tid;
-    return isSuccessResp && isValidTransactionId;
+    if (vt && vt.integrityKey) {
+      hasValidIntegrity = this.validateMessageIntegrity(vt.integrityKey);
+    }
+
+    return isSuccessResp && hasValidTransactionId && hasValidIntegrity;
   }
 
   setMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
@@ -126,7 +143,7 @@ export class StunMessage {
     return Buffer.concat([$header, $body]);
   }
 
-  loadBuffer($buffer: Buffer, integrityKey?: string): boolean {
+  loadBuffer($buffer: Buffer): boolean {
     if (!isStunMessage($buffer)) {
       return false;
     }
@@ -189,13 +206,17 @@ export class StunMessage {
       loadedAttrType.add(type);
     }
 
+    return true;
+  }
+
+  private validateMessageIntegrity(integrityKey: string): boolean {
+    const messageIntegrityAttr = this.getMessageIntegrityAttribute();
     // check integrity if exists
-    const messageIntegrity = this.getMessageIntegrityAttribute();
-    if (messageIntegrity && integrityKey) {
+    if (messageIntegrityAttr !== null) {
       // without MESSAGE-INTEGRITY(header: 4byte + value: 20byte(sha1))
       const $msg = this.toBuffer().slice(0, -24);
       const $digest = generateHmacSha1Digest(integrityKey, $msg);
-      if (!$digest.equals(messageIntegrity.value)) {
+      if (!$digest.equals(messageIntegrityAttr.value)) {
         return false;
       }
     }
