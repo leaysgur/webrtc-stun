@@ -48,8 +48,15 @@ export class StunMessage {
   isBindingRequest(): boolean {
     return this.header.type === STUN_MESSAGE_TYPE.BINDING_REQUEST;
   }
-  isBindingResponseSuccess(): boolean {
-    return this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS;
+  isBindingResponseSuccess(tid?: string): boolean {
+    const isSuccessResp =
+      this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS;
+
+    if (!tid) {
+      return isSuccessResp;
+    }
+    const isValidTransactionId = this.header.transactionId === tid;
+    return isSuccessResp && isValidTransactionId;
   }
 
   setMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {

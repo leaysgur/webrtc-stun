@@ -50,6 +50,11 @@ describe('isBindingResponseSuccess()', () => {
     const blank = stun.createBlank();
     expect(blank.isBindingResponseSuccess()).toBeFalsy();
   });
+
+  test('returns false for invalid transactionId', () => {
+    const res = msg.createBindingResponse(true);
+    expect(res.isBindingResponseSuccess('invalid-tid')).toBeFalsy();
+  });
 });
 
 describe('setMappedAddressAttribute() / getMappedAddressAttribute()', () => {
