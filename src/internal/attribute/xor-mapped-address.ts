@@ -1,12 +1,6 @@
+import * as nodeIp from 'ip';
 import { STUN_ATTRIBUTE_TYPE } from '../constants';
-import {
-  bufferXor,
-  writeAttrBuffer,
-  ipV4BufferToString,
-  ipV4StringToBuffer,
-  ipV6BufferToString,
-  ipV6StringToBuffer,
-} from '../utils';
+import { bufferXor, writeAttrBuffer } from '../utils';
 import { Header } from '../header';
 
 export interface XorMappedAddressPayload {
@@ -92,10 +86,10 @@ export class XorMappedAddressAttribute {
   private decodeIpV4($attr: Buffer, header: Header): string {
     const $xaddress = $attr.slice(4, 8);
     const $ip = bufferXor($xaddress, header.magicCookieAsBuffer);
-    return ipV4BufferToString($ip);
+    return nodeIp.toString($ip);
   }
   private encodeIpV4(ip: string, header: Header): Buffer {
-    const $ip = ipV4StringToBuffer(ip);
+    const $ip = nodeIp.toBuffer(ip);
     const $xaddress = bufferXor($ip, header.magicCookieAsBuffer);
     return $xaddress;
   }
@@ -107,10 +101,10 @@ export class XorMappedAddressAttribute {
       $xaddress,
       Buffer.concat([header.magicCookieAsBuffer, header.transactionIdAsBuffer]),
     );
-    return ipV6BufferToString($ip);
+    return nodeIp.toString($ip);
   }
   private encodeIpV6(ip: string, header: Header): Buffer {
-    const $ip = ipV6StringToBuffer(ip);
+    const $ip = nodeIp.toBuffer(ip);
     const $xaddress = bufferXor(
       $ip,
       Buffer.concat([header.magicCookieAsBuffer, header.transactionIdAsBuffer]),
