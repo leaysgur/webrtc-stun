@@ -23,7 +23,7 @@ export interface XorMappedAddressPayload {
  */
 export class XorMappedAddressAttribute {
   static createBlank(): XorMappedAddressAttribute {
-    return new XorMappedAddressAttribute('', -1, '');
+    return new XorMappedAddressAttribute('', 0, '');
   }
 
   constructor(
