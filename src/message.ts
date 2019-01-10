@@ -4,29 +4,23 @@ import {
   generateTransactionId,
   generateHmacSha1Digest,
   calcPaddingByte,
-} from './internal/utils';
-import { Header } from './internal/header';
+} from './utils';
+import { Header } from './header';
 import {
   MappedAddressAttribute,
   MappedAddressPayload,
-} from './internal/attribute/mapped-address';
-import {
-  UsernameAttribute,
-  UsernamePayload,
-} from './internal/attribute/username';
+} from './attribute/mapped-address';
+import { UsernameAttribute, UsernamePayload } from './attribute/username';
 import {
   MessageIntegrityAttribute,
   MessageIntegrityPayload,
-} from './internal/attribute/message-integrity';
+} from './attribute/message-integrity';
 import {
   XorMappedAddressAttribute,
   XorMappedAddressPayload,
-} from './internal/attribute/xor-mapped-address';
-import {
-  SoftwareAttribute,
-  SoftwarePayload,
-} from './internal/attribute/software';
-import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './internal/constants';
+} from './attribute/xor-mapped-address';
+import { SoftwareAttribute, SoftwarePayload } from './attribute/software';
+import { STUN_MESSAGE_TYPE, STUN_ATTRIBUTE_TYPE } from './constants';
 
 type Attribute =
   | MappedAddressAttribute
