@@ -1,5 +1,5 @@
-import { XorMappedAddressAttribute } from '../../../src/internal/attribute/xor-mapped-address';
-import { Header } from '../../../src/internal/header';
+import { XorMappedAddressAttribute } from '../../src/attribute/xor-mapped-address';
+import { Header } from '../../src/header';
 
 describe('static createBlank()', () => {
   test('create blank instance', () => {

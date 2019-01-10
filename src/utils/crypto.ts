@@ -1,7 +1,7 @@
 import { randomBytes, createHmac } from 'crypto';
 
-export function generateTransactionId(): string {
-  return randomBytes(12).toString('hex');
+export function generateTransactionId(len: number): string {
+  return randomBytes(len).toString('hex');
 }
 
 export function generateHmacSha1Digest(key: string, $buf: Buffer): Buffer {
