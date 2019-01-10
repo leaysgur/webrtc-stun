@@ -27,6 +27,25 @@ describe('isBindingRequest()', () => {
     expect(msg.isBindingRequest()).toBeTruthy();
   });
 
+  test('returns true for request has no integrity', () => {
+    const msg = stun.createBindingRequest();
+    expect(msg.isBindingRequest({ integrityKey: 'hi' })).toBeTruthy();
+  });
+
+  test('returns true for request has valid integrity', () => {
+    const msg = stun
+      .createBindingRequest()
+      .setMessageIntegrityAttribute('hello');
+    expect(msg.isBindingRequest({ integrityKey: 'hello' })).toBeTruthy();
+  });
+
+  test('returns false for request has wrong integrity', () => {
+    const msg = stun
+      .createBindingRequest()
+      .setMessageIntegrityAttribute('hello');
+    expect(msg.isBindingRequest({ integrityKey: 'wrong' })).toBeFalsy();
+  });
+
   test('returns false for blank', () => {
     const blank = stun.createBlank();
     expect(blank.isBindingRequest()).toBeFalsy();
@@ -34,11 +53,26 @@ describe('isBindingRequest()', () => {
 });
 
 describe('isBindingResponseSuccess()', () => {
-  const msg = stun.createBindingRequest();
+  const tid = stun.generateTransactionId();
+  const msg = stun.createBindingRequest(tid);
 
   test('returns true for success response', () => {
     const res = msg.createBindingResponse(true);
     expect(res.isBindingResponseSuccess()).toBeTruthy();
+  });
+
+  test('returns true for valid transactionId', () => {
+    const res = msg.createBindingResponse(true);
+    expect(res.isBindingResponseSuccess({ transactionId: tid })).toBeTruthy();
+  });
+
+  test('returns true for valid integrity', () => {
+    const res = msg
+      .createBindingResponse(true)
+      .setMessageIntegrityAttribute('hello');
+    expect(
+      res.isBindingResponseSuccess({ integrityKey: 'hello' }),
+    ).toBeTruthy();
   });
 
   test('returns false for error response', () => {
@@ -46,14 +80,35 @@ describe('isBindingResponseSuccess()', () => {
     expect(res.isBindingResponseSuccess()).toBeFalsy();
   });
 
+  test('returns false for invalid transactionId', () => {
+    const res = msg.createBindingResponse(true);
+    expect(
+      res.isBindingResponseSuccess({ transactionId: '9999999999999999999999' }),
+    ).toBeFalsy();
+  });
+
+  test('returns false for invalid integrity', () => {
+    const res = msg
+      .createBindingResponse(true)
+      .setMessageIntegrityAttribute('hello');
+    expect(res.isBindingResponseSuccess({ integrityKey: 'wrong' })).toBeFalsy();
+  });
+
+  test('returns false for valid transactionId but invalid integrity', () => {
+    const res = msg
+      .createBindingResponse(true)
+      .setMessageIntegrityAttribute('hello');
+    expect(
+      res.isBindingResponseSuccess({
+        transactionId: tid,
+        integrityKey: 'wrong',
+      }),
+    ).toBeFalsy();
+  });
+
   test('returns false for blank', () => {
     const blank = stun.createBlank();
     expect(blank.isBindingResponseSuccess()).toBeFalsy();
-  });
-
-  test('returns false for invalid transactionId', () => {
-    const res = msg.createBindingResponse(true);
-    expect(res.isBindingResponseSuccess('invalid-tid')).toBeFalsy();
   });
 });
 
