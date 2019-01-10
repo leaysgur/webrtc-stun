@@ -1,4 +1,4 @@
-import { SoftwareAttribute } from '../../../lib/internal/attribute/software';
+import { SoftwareAttribute } from '../../../src/internal/attribute/software';
 
 describe('static createBlank()', () => {
   test('create blank instance', () => {

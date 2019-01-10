@@ -1,4 +1,4 @@
-import * as utils from '../../../lib/internal/utils';
+import * as utils from '../../../src/internal/utils';
 
 describe('generateTransactionId()', () => {
   test('generates 12bytes(length = 24) tid', () => {

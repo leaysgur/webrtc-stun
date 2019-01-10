@@ -1,4 +1,16 @@
-import * as utils from '../../../lib/internal/utils';
+import * as utils from '../../../src/internal/utils';
+
+describe('isStunMessage()', () => {
+  test('returns true for 1st 2bit is 0', () => {
+    const $buf = Buffer.from('00', 'hex');
+    expect(utils.isStunMessage($buf)).toBeTruthy();
+  });
+
+  test('returns false for 1st 2bit is not 0', () => {
+    const $buf = Buffer.from('90', 'hex');
+    expect(utils.isStunMessage($buf)).toBeFalsy();
+  });
+});
 
 describe('numberToBinaryStringArray()', () => {
   test('accepts exact digit', () => {

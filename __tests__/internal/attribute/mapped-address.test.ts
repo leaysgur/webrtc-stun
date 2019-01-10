@@ -1,4 +1,4 @@
-import { MappedAddressAttribute } from '../../../lib/internal/attribute/mapped-address';
+import { MappedAddressAttribute } from '../../../src/internal/attribute/mapped-address';
 
 describe('static createBlank()', () => {
   test('create blank instance', () => {
