@@ -1,16 +1,17 @@
 const dgram = require('dgram');
-const { StunMessage } = require('..');
+const stun = require('..');
 const pkg = require('../package.json');
 
 const socket = dgram.createSocket({ type: 'udp4' });
 
+const tid = stun.generateTransactionId();
 socket.on('message', msg => {
-  const res = StunMessage.createBlank();
+  const res = stun.createBlank();
 
   // if msg is valid STUN message
   if (res.loadBuffer(msg)) {
     // if msg is BINDING_RESPONSE_SUCCESS
-    if (res.isBindingResponseSuccess()) {
+    if (res.isBindingResponseSuccess(tid)) {
       const attr = res.getXorMappedAddressAttribute();
       // if msg includes attr
       if (attr) {
@@ -22,8 +23,8 @@ socket.on('message', msg => {
   socket.close();
 });
 
-const req = StunMessage
-  .createBindingRequest()
+const req = stun
+  .createBindingRequest(tid)
   .setSoftwareAttribute(`${pkg.name}@${pkg.version}`);
 console.log('REQUEST', req);
 // socket.send(req.toBuffer(), 3478, 'stun.webrtc.ecl.ntt.com');
