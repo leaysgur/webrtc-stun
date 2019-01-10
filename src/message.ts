@@ -1,8 +1,8 @@
 import { RemoteInfo } from 'dgram';
 import {
+  isStunMessage,
   generateTransactionId,
   generateHmacSha1Digest,
-  numberToBinaryStringArray,
   calcPaddingByte,
 } from './internal/utils';
 import { Header } from './internal/header';
@@ -136,9 +136,7 @@ export class StunMessage {
   }
 
   loadBuffer($buffer: Buffer, integrityKey?: string): boolean {
-    // the first 2bit are 0 in first 1byte
-    const first8bit = numberToBinaryStringArray($buffer[0], 8);
-    if (!(first8bit[0] === '0' && first8bit[1] === '0')) {
+    if (!isStunMessage($buffer)) {
       return false;
     }
 

@@ -1,9 +1,18 @@
+export function isStunMessage($buffer: Buffer): boolean {
+  // the first 2bit must be 0 in first 1byte
+  const first8bit = numberToBinaryStringArray($buffer[0], 8);
+  if (first8bit[0] === '0' && first8bit[1] === '0') {
+    return true;
+  }
+  return false;
+}
+
 /**
  * The toString for bit operation
  *
  * (1, 4) -> [0, 0, 0, 1]
  * (10, 4) -> [1, 0, 1, 0]
- * (257, 8) -> [0, 0, 0, 0, 0, 1, 0, 1]
+ * (257, 8) -> [1, 0, 0, 0, 0, 0, 0, 1]
  */
 export function numberToBinaryStringArray(
   num: number,
