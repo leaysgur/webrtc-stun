@@ -4,7 +4,7 @@ import { generateTransactionId as generateTId } from './utils';
 import { STUN_MESSAGE_TYPE } from './constants';
 
 export function createBlank(): StunMessage {
-  return new StunMessage(new Header(0, generateTransactionId()));
+  return new StunMessage(new Header(0, generateTId(12)));
 }
 
 export function createBindingRequest(tid: string): StunMessage {
@@ -12,5 +12,5 @@ export function createBindingRequest(tid: string): StunMessage {
 }
 
 export function generateTransactionId(): string {
-  return generateTId();
+  return generateTId(12);
 }
