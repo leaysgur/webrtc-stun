@@ -1,7 +1,6 @@
 import { RemoteInfo } from 'dgram';
 import {
   isStunMessage,
-  generateTransactionId,
   generateHmacSha1Digest,
   calcPaddingByte,
 } from './utils';
@@ -30,15 +29,6 @@ type Attribute =
   | SoftwareAttribute;
 
 export class StunMessage {
-  static createBlank(): StunMessage {
-    return new StunMessage(new Header(-1, generateTransactionId()));
-  }
-  static createBindingRequest(): StunMessage {
-    return new StunMessage(
-      new Header(STUN_MESSAGE_TYPE.BINDING_REQUEST, generateTransactionId()),
-    );
-  }
-
   private header: Header;
   private attributes: Attribute[];
   constructor(header: Header) {
