@@ -1,4 +1,4 @@
-import * as utils from '../../../src/internal/utils';
+import * as utils from '../../src/utils';
 
 describe('isStunMessage()', () => {
   test('returns true for 1st 2bit is 0', () => {

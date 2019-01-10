@@ -1,4 +1,4 @@
-import { Header } from '../../src/internal/header';
+import { Header } from '../src/header';
 
 describe('constructor()', () => {
   const type = 1;

@@ -1,4 +1,4 @@
-import { UsernameAttribute } from '../../../src/internal/attribute/username';
+import { UsernameAttribute } from '../../src/attribute/username';
 
 describe('static createBlank()', () => {
   test('create blank instance', () => {
