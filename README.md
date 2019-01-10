@@ -1,21 +1,16 @@
 # webrtc-stun
 
-STUN implementation for WebRTC.
+100% TypeScript STUN implementation for WebRTC.
 
 ```
 npm i webrtc-stun
 ```
 
-- 0 dependencies
-- 100% TypeScript
-
 Currently only supports [RFC5389](https://tools.ietf.org/html/rfc5389) and still WIP.
 
 ## Supported attribute
 - [MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.1)
-  - IPv4 only
 - [XOR-MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.2)
-  - IPv4 only
 - [USERNAME](https://tools.ietf.org/html/rfc5389#section-15.3)
 - [MESSAGE-INTEGRITY](https://tools.ietf.org/html/rfc5389#section-15.4)
 - [SOFTWARE](https://tools.ietf.org/html/rfc5389#section-15.10)
