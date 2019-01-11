@@ -1,10 +1,10 @@
 import { RemoteInfo } from 'dgram';
-import * as crc32 from 'buffer-crc32';
 import {
   isStunMessage,
-  generateHmacSha1Digest,
+  generateFingerprint,
+  generateIntegrity,
+  generateIntegrityWithFingerprint,
   calcPaddingByte,
-  bufferXor,
 } from './utils';
 import { Header } from './header';
 import {
@@ -53,6 +53,7 @@ export class StunMessage {
     const type = isSuccess
       ? STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS
       : STUN_MESSAGE_TYPE.BINDING_RESPONSE_ERROR;
+
     // send back same id for transaction
     const tid = this.header.transactionId;
     return new StunMessage(new Header(type, tid));
@@ -122,10 +123,8 @@ export class StunMessage {
     const attr = new MessageIntegrityAttribute();
     this.attributes.push(attr);
 
-    // without MESSAGE-INTEGRITY(header: 4byte + value: 20byte(sha1))
-    const $msg = this.toBuffer().slice(0, -24);
-    const $digest = generateHmacSha1Digest(integrityKey, $msg);
-    attr.loadBuffer($digest);
+    const $integrity = generateIntegrity(this.toBuffer(), integrityKey);
+    attr.loadBuffer($integrity);
 
     return this;
   }
@@ -140,9 +139,7 @@ export class StunMessage {
     const attr = new FingerprintAttribute();
     this.attributes.push(attr);
 
-    // TODO: utils
-    const $crc32 = crc32(this.toBuffer().slice(0, -8));
-    const $fp = bufferXor($crc32, Buffer.from([0x53, 0x54, 0x55, 0x4e]));
+    const $fp = generateFingerprint(this.toBuffer());
     attr.loadBuffer($fp);
 
     return this;
@@ -258,32 +255,15 @@ export class StunMessage {
     const fingerprintAttr = this.getFingerprintAttribute();
     // check if integrity w/o fingerprit
     if (fingerprintAttr === null) {
-      // without 24byte MESSAGE-INTEGRITY: 24byte = (header: 4byte + value: 20byte(sha1))
-      const $msg = this.toBuffer().slice(0, -24);
-
-      const $digest = generateHmacSha1Digest(integrityKey, $msg);
+      const $digest = generateIntegrity(this.toBuffer(), integrityKey);
       return $digest.equals(messageIntegrityAttr.value);
     }
 
     // check if integrity w/ fingerprint
-    return this.validateMessageIntegrityWithFingerprint(
+    return generateIntegrityWithFingerprint(
+      this.toBuffer(),
       integrityKey,
-      messageIntegrityAttr.value,
-    );
-  }
-
-  private validateMessageIntegrityWithFingerprint(
-    integrityKey: string,
-    $integrity: Buffer,
-  ): boolean {
-    // without 32byte MESSAGE-INTEGRITY(24byte)
-    // + FINGERPRINT: 8byte = (header: 4byte + value: 4byte)
-    const $msg = this.toBuffer().slice(0, -32);
-    // modify header length to ignore FINGERPRINT(8byte)
-    $msg.writeUInt16BE(this.header.length - 8, 2);
-
-    const $digest = generateHmacSha1Digest(integrityKey, $msg);
-    return $digest.equals($integrity);
+    ).equals(messageIntegrityAttr.value);
   }
 
   private validateFingerprint(): boolean {
@@ -293,9 +273,7 @@ export class StunMessage {
       return true;
     }
 
-    // without FINGERPRINT(header: 4byte + value: 4byte(32bit))
-    const $crc32 = crc32(this.toBuffer().slice(0, -8));
-    const $fp = bufferXor($crc32, Buffer.from([0x53, 0x54, 0x55, 0x4e]));
+    const $fp = generateFingerprint(this.toBuffer());
     return $fp.equals(fingerprintAttr.value);
   }
 
