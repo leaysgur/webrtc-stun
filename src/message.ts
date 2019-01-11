@@ -140,11 +140,10 @@ export class StunMessage {
     const attr = new FingerprintAttribute();
     this.attributes.push(attr);
 
-    // TODO: impl
-    // without MESSAGE-INTEGRITY(header: 4byte + value: 20byte(sha1))
-    // const $msg = this.toBuffer().slice(0, -24);
-    // const $digest = generateHmacSha1Digest(integrityKey, $msg);
-    // attr.loadBuffer($digest);
+    // TODO: utils
+    const $crc32 = crc32(this.toBuffer().slice(0, -8));
+    const $fp = bufferXor($crc32, Buffer.from([0x53, 0x54, 0x55, 0x4e]));
+    attr.loadBuffer($fp);
 
     return this;
   }
