@@ -15,7 +15,7 @@ export function generateHmacSha1Digest(key: string, $buf: Buffer): Buffer {
 export function generateFingerprint($msg: Buffer): Buffer {
   // without FINGERPRINT: 8byte(header: 4byte + value: 4byte(32bit))
   const $crc32 = crc32($msg.slice(0, -8));
-  return bufferXor($crc32, Buffer.from([0x53, 0x54, 0x55, 0x4e]));
+  return bufferXor($crc32, Buffer.from('5354554e', 'hex'));
 }
 
 export function generateIntegrity($msg: Buffer, integrityKey: string): Buffer {

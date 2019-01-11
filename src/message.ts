@@ -119,7 +119,7 @@ export class StunMessage {
   }
 
   setMessageIntegrityAttribute(integrityKey: string): StunMessage {
-    // first add with dummy to fix total length
+    // add dummy first to disguise total length
     const attr = new MessageIntegrityAttribute();
     this.attributes.push(attr);
 
@@ -135,7 +135,7 @@ export class StunMessage {
   }
 
   setFingerprintAttribute(): StunMessage {
-    // first add with dummy to fix total length
+    // add dummy first to disguise total length
     const attr = new FingerprintAttribute();
     this.attributes.push(attr);
 
@@ -175,7 +175,6 @@ export class StunMessage {
       [...this.attributes.values()].map(i => i.toBuffer(this.header)),
     );
     const $header = this.header.toBuffer($body.length);
-
     return Buffer.concat([$header, $body]);
   }
 
@@ -255,8 +254,9 @@ export class StunMessage {
     const fingerprintAttr = this.getFingerprintAttribute();
     // check if integrity w/o fingerprit
     if (fingerprintAttr === null) {
-      const $digest = generateIntegrity(this.toBuffer(), integrityKey);
-      return $digest.equals(messageIntegrityAttr.value);
+      return generateIntegrity(this.toBuffer(), integrityKey).equals(
+        messageIntegrityAttr.value,
+      );
     }
 
     // check if integrity w/ fingerprint
