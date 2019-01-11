@@ -1,8 +1,10 @@
 import { RemoteInfo } from 'dgram';
+import * as crc32 from 'buffer-crc32';
 import {
   isStunMessage,
   generateHmacSha1Digest,
   calcPaddingByte,
+  bufferXor,
 } from './utils';
 import { Header } from './header';
 import {
@@ -15,6 +17,10 @@ import {
   MessageIntegrityPayload,
 } from './attribute/message-integrity';
 import {
+  FingerprintAttribute,
+  FingerprintPayload,
+} from './attribute/fingerpinrt';
+import {
   XorMappedAddressAttribute,
   XorMappedAddressPayload,
 } from './attribute/xor-mapped-address';
@@ -26,11 +32,13 @@ type Attribute =
   | UsernameAttribute
   | MessageIntegrityAttribute
   | XorMappedAddressAttribute
-  | SoftwareAttribute;
+  | SoftwareAttribute
+  | FingerprintAttribute;
 
 interface ValidationTarget {
   transactionId?: string;
   integrityKey?: string;
+  fingerprint?: boolean;
 }
 
 export class StunMessage {
@@ -52,13 +60,18 @@ export class StunMessage {
 
   isBindingRequest(vt?: ValidationTarget): boolean {
     const isRequest = this.header.type === STUN_MESSAGE_TYPE.BINDING_REQUEST;
+    let hasValidFingerprint = true;
     let hasValidIntegrity = true;
+
+    if (vt && vt.fingerprint) {
+      hasValidFingerprint = this.validateFingerprint();
+    }
 
     if (vt && vt.integrityKey) {
       hasValidIntegrity = this.validateMessageIntegrity(vt.integrityKey);
     }
 
-    return isRequest && hasValidIntegrity;
+    return isRequest && hasValidFingerprint && hasValidIntegrity;
   }
   isBindingResponseSuccess(vt?: ValidationTarget): boolean {
     const isSuccessResp =
@@ -111,6 +124,24 @@ export class StunMessage {
   getMessageIntegrityAttribute(): MessageIntegrityPayload | null {
     return this.getPayloadByType<MessageIntegrityPayload>(
       STUN_ATTRIBUTE_TYPE.MESSAGE_INTEGRITY,
+    );
+  }
+
+  setFingerprintAttribute(): StunMessage {
+    // first add with dummy to fix total length
+    const attr = new FingerprintAttribute();
+    this.attributes.push(attr);
+
+    // without MESSAGE-INTEGRITY(header: 4byte + value: 20byte(sha1))
+    // const $msg = this.toBuffer().slice(0, -24);
+    // const $digest = generateHmacSha1Digest(integrityKey, $msg);
+    // attr.loadBuffer($digest);
+
+    return this;
+  }
+  getFingerprintAttribute(): FingerprintPayload | null {
+    return this.getPayloadByType<FingerprintPayload>(
+      STUN_ATTRIBUTE_TYPE.FINGERPRINT,
     );
   }
 
@@ -211,17 +242,54 @@ export class StunMessage {
 
   private validateMessageIntegrity(integrityKey: string): boolean {
     const messageIntegrityAttr = this.getMessageIntegrityAttribute();
-    // check integrity if exists
-    if (messageIntegrityAttr !== null) {
-      // without MESSAGE-INTEGRITY(header: 4byte + value: 20byte(sha1))
-      const $msg = this.toBuffer().slice(0, -24);
-      const $digest = generateHmacSha1Digest(integrityKey, $msg);
-      if (!$digest.equals(messageIntegrityAttr.value)) {
-        return false;
-      }
+    // check if integrity exists
+    if (messageIntegrityAttr === null) {
+      return true;
     }
 
-    return true;
+    const fingerprintAttr = this.getFingerprintAttribute();
+    // check if integrity w/o fingerprit
+    if (fingerprintAttr === null) {
+      // without 24byte MESSAGE-INTEGRITY
+      // 24byte = (header: 4byte + value: 20byte(sha1)
+      const $msg = this.toBuffer().slice(0, -24);
+      const $digest = generateHmacSha1Digest(integrityKey, $msg);
+      return $digest.equals(messageIntegrityAttr.value);
+    }
+
+    // check if integrity w/ fingerprint
+    return this.validateMessageIntegrityWithFingerprint(
+      integrityKey,
+      messageIntegrityAttr.value,
+    );
+  }
+
+  private validateMessageIntegrityWithFingerprint(
+    integrityKey: string,
+    $integrity: Buffer,
+  ): boolean {
+    // without 32byte MESSAGE-INTEGRITY(24byte) + FINGERPRINT
+    // 8byte = (header: 4byte + value: 4byte)
+    const $msg = this.toBuffer().slice(0, -32);
+    // temporary modify header length to ignore FINGERPRINT
+    const len = $msg.readUInt16BE(2);
+    $msg.writeUInt16BE(len - 8, 2);
+
+    const $digest = generateHmacSha1Digest(integrityKey, $msg);
+    return $digest.equals($integrity);
+  }
+
+  private validateFingerprint(): boolean {
+    const fingerprintAttr = this.getFingerprintAttribute();
+    // check if fingerprint exists
+    if (fingerprintAttr === null) {
+      return true;
+    }
+
+    // without FINGERPRINT(header: 4byte + value: 4byte(32bit))
+    const $crc32 = crc32(this.toBuffer().slice(0, -8));
+    const $fp = bufferXor($crc32, Buffer.from([0x53, 0x54, 0x55, 0x4e]));
+    return $fp.equals(fingerprintAttr.value);
   }
 
   private getPayloadByType<T>(type: number): T | null {
@@ -236,6 +304,7 @@ export class StunMessage {
       [`${STUN_ATTRIBUTE_TYPE.MESSAGE_INTEGRITY}`]: MessageIntegrityAttribute,
       [`${STUN_ATTRIBUTE_TYPE.XOR_MAPPED_ADDRESS}`]: XorMappedAddressAttribute,
       [`${STUN_ATTRIBUTE_TYPE.SOFTWARE}`]: SoftwareAttribute,
+      [`${STUN_ATTRIBUTE_TYPE.FINGERPRINT}`]: FingerprintAttribute,
     }[type];
     return Attr ? Attr.createBlank() : null;
   }

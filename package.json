@@ -11,6 +11,8 @@
   "devDependencies": {
     "@types/jest": "^23.3.12",
     "@types/node": "^10.12.12",
+    "@types/buffer-crc32": "^0.2.0",
+    "@types/ip": "^1.1.0",
     "jest": "^23.6.0",
     "prettier": "^1.15.3",
     "ts-jest": "^23.10.5",
@@ -20,7 +22,7 @@
     "typescript": "^3.2.2"
   },
   "dependencies": {
-    "@types/ip": "^1.1.0",
+    "buffer-crc32": "^0.2.13",
     "ip": "^1.1.5"
   },
   "scripts": {
