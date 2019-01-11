@@ -66,7 +66,6 @@ export class StunMessage {
     if (vt && vt.fingerprint) {
       hasValidFingerprint = this.validateFingerprint();
     }
-
     if (vt && vt.integrityKey) {
       hasValidIntegrity = this.validateMessageIntegrity(vt.integrityKey);
     }
@@ -77,16 +76,25 @@ export class StunMessage {
     const isSuccessResp =
       this.header.type === STUN_MESSAGE_TYPE.BINDING_RESPONSE_SUCCESS;
     let hasValidTransactionId = true;
+    let hasValidFingerprint = true;
     let hasValidIntegrity = true;
 
     if (vt && vt.transactionId) {
       hasValidTransactionId = this.header.transactionId === vt.transactionId;
     }
+    if (vt && vt.fingerprint) {
+      hasValidFingerprint = this.validateFingerprint();
+    }
     if (vt && vt.integrityKey) {
       hasValidIntegrity = this.validateMessageIntegrity(vt.integrityKey);
     }
 
-    return isSuccessResp && hasValidTransactionId && hasValidIntegrity;
+    return (
+      isSuccessResp &&
+      hasValidTransactionId &&
+      hasValidFingerprint &&
+      hasValidIntegrity
+    );
   }
 
   setMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
@@ -132,6 +140,7 @@ export class StunMessage {
     const attr = new FingerprintAttribute();
     this.attributes.push(attr);
 
+    // TODO: impl
     // without MESSAGE-INTEGRITY(header: 4byte + value: 20byte(sha1))
     // const $msg = this.toBuffer().slice(0, -24);
     // const $digest = generateHmacSha1Digest(integrityKey, $msg);
@@ -250,9 +259,9 @@ export class StunMessage {
     const fingerprintAttr = this.getFingerprintAttribute();
     // check if integrity w/o fingerprit
     if (fingerprintAttr === null) {
-      // without 24byte MESSAGE-INTEGRITY
-      // 24byte = (header: 4byte + value: 20byte(sha1)
+      // without 24byte MESSAGE-INTEGRITY: 24byte = (header: 4byte + value: 20byte(sha1))
       const $msg = this.toBuffer().slice(0, -24);
+
       const $digest = generateHmacSha1Digest(integrityKey, $msg);
       return $digest.equals(messageIntegrityAttr.value);
     }
@@ -268,12 +277,11 @@ export class StunMessage {
     integrityKey: string,
     $integrity: Buffer,
   ): boolean {
-    // without 32byte MESSAGE-INTEGRITY(24byte) + FINGERPRINT
-    // 8byte = (header: 4byte + value: 4byte)
+    // without 32byte MESSAGE-INTEGRITY(24byte)
+    // + FINGERPRINT: 8byte = (header: 4byte + value: 4byte)
     const $msg = this.toBuffer().slice(0, -32);
-    // temporary modify header length to ignore FINGERPRINT
-    const len = $msg.readUInt16BE(2);
-    $msg.writeUInt16BE(len - 8, 2);
+    // modify header length to ignore FINGERPRINT(8byte)
+    $msg.writeUInt16BE(this.header.length - 8, 2);
 
     const $digest = generateHmacSha1Digest(integrityKey, $msg);
     return $digest.equals($integrity);
