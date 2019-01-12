@@ -27,6 +27,7 @@
   },
   "scripts": {
     "test": "jest",
+    "tsnode": "ts-node",
     "lint": "tslint -p . --fix && tsc -p . --noEmit",
     "build": "tsc -d -p ."
   },
