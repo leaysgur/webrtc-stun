@@ -227,7 +227,12 @@ export class StunMessage {
       const attr = this.getBlankAttributeByType(type);
       // skip not supported
       if (attr === null) {
-        console.log(`[webrtc-stun] Attr type 0x${type.toString(16)} is not supported yet.`);
+        console.log(
+          `[webrtc-stun] Attr type 0x${type.toString(
+            16,
+          )} is not supported yet.`,
+          $value,
+        );
         continue;
       }
 
