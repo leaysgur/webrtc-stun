@@ -39,11 +39,26 @@ describe('isBindingRequest()', () => {
     expect(msg.isBindingRequest({ integrityKey: 'hello' })).toBeTruthy();
   });
 
+  test('returns true for request has valid fingerprint', () => {
+    const msg = stun.createBindingRequest().setFingerprintAttribute();
+    expect(msg.isBindingRequest({ fingerprint: true })).toBeTruthy();
+  });
+
   test('returns false for request has wrong integrity', () => {
     const msg = stun
       .createBindingRequest()
       .setMessageIntegrityAttribute('hello');
     expect(msg.isBindingRequest({ integrityKey: 'wrong' })).toBeFalsy();
+  });
+
+  test('returns false for request has valid fingerprint but wrong integrity', () => {
+    const msg = stun
+      .createBindingRequest()
+      .setMessageIntegrityAttribute('hello')
+      .setFingerprintAttribute();
+    expect(
+      msg.isBindingRequest({ integrityKey: 'wrong', fingerprint: true }),
+    ).toBeFalsy();
   });
 
   test('returns false for blank', () => {
@@ -75,6 +90,11 @@ describe('isBindingResponseSuccess()', () => {
     ).toBeTruthy();
   });
 
+  test('returns true for valid fingerprint', () => {
+    const res = msg.createBindingResponse(true).setFingerprintAttribute();
+    expect(res.isBindingResponseSuccess({ fingerprint: true })).toBeTruthy();
+  });
+
   test('returns false for error response', () => {
     const res = msg.createBindingResponse(false);
     expect(res.isBindingResponseSuccess()).toBeFalsy();
@@ -102,6 +122,19 @@ describe('isBindingResponseSuccess()', () => {
       res.isBindingResponseSuccess({
         transactionId: tid,
         integrityKey: 'wrong',
+      }),
+    ).toBeFalsy();
+  });
+
+  test('returns false for valid fingerprint but invalid integrity', () => {
+    const res = msg
+      .createBindingResponse(true)
+      .setMessageIntegrityAttribute('hello')
+      .setFingerprintAttribute();
+    expect(
+      res.isBindingResponseSuccess({
+        integrityKey: 'wrong',
+        fingerprint: true,
       }),
     ).toBeFalsy();
   });
@@ -315,6 +348,44 @@ describe('set / getMessageIntegrityAttribute()', () => {
 
     expect(msg.loadBuffer($buf)).toBeTruthy();
     expect(msg.getMessageIntegrityAttribute()).not.toBeNull();
+  });
+});
+
+describe('set / getFingerprintAttribute()', () => {
+  test('sets attr', () => {
+    const msg = stun.createBindingRequest();
+    // save length w/o header
+    const len1 = msg.toBuffer().slice(20).length;
+
+    msg.setFingerprintAttribute();
+    const len2 = msg.toBuffer().slice(20).length;
+    expect(len1).not.toBe(len2);
+  });
+
+  test('gets attr(from myself)', () => {
+    const msg = stun.createBindingRequest();
+    expect(msg.getFingerprintAttribute()).toBeNull();
+
+    msg.setFingerprintAttribute();
+    expect(msg.getFingerprintAttribute()).not.toBeNull();
+  });
+
+  test('gets attr(from buffer)', () => {
+    const msg = stun.createBlank();
+    const $buf = Buffer.from(
+      '0001' +
+      '0008' + // length = 16byte = `10` as hex
+        '2112a442' +
+        '999999999999999999999999' +
+        // FINGERPRINT
+        '8028' +
+        '0004' +
+        '0d3470d1',
+      'hex',
+    );
+
+    expect(msg.loadBuffer($buf)).toBeTruthy();
+    expect(msg.getFingerprintAttribute()).not.toBeNull();
   });
 });
 
