@@ -14,9 +14,9 @@ Currently only supports [RFC5389](https://tools.ietf.org/html/rfc5389) and still
 - [USERNAME](https://tools.ietf.org/html/rfc5389#section-15.3)
 - [MESSAGE-INTEGRITY](https://tools.ietf.org/html/rfc5389#section-15.4)
 - [SOFTWARE](https://tools.ietf.org/html/rfc5389#section-15.10)
+- [FINGERPRINT](https://tools.ietf.org/html/rfc5389#section-15.5)
 
 ## Not supported
-- [FINGERPRINT](https://tools.ietf.org/html/rfc5389#section-15.5)
 - [ERROR-CODE](https://tools.ietf.org/html/rfc5389#section-15.6)
 - [REALM](https://tools.ietf.org/html/rfc5389#section-15.7)
 - [NONCE](https://tools.ietf.org/html/rfc5389#section-15.8)
