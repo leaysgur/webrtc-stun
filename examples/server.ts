@@ -8,7 +8,7 @@ socket.on('message', (msg, rinfo) => {
 
   // if msg is valid STUN message
   if (req.loadBuffer(msg)) {
-    // if STUN message is BINDING_REQUEST and valid one
+    // if STUN message is BINDING_REQUEST and valid content
     if (req.isBindingRequest({ fingerprint: true })) {
       console.log('REQUEST', req);
 

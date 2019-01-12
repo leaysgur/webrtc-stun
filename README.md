@@ -16,7 +16,7 @@ Currently only supports [RFC5389](https://tools.ietf.org/html/rfc5389) and still
 - [SOFTWARE](https://tools.ietf.org/html/rfc5389#section-15.10)
 - [FINGERPRINT](https://tools.ietf.org/html/rfc5389#section-15.5)
 
-## Not supported
+## Not supported yet
 - [ERROR-CODE](https://tools.ietf.org/html/rfc5389#section-15.6)
 - [REALM](https://tools.ietf.org/html/rfc5389#section-15.7)
 - [NONCE](https://tools.ietf.org/html/rfc5389#section-15.8)
@@ -38,7 +38,7 @@ socket.on('message', msg => {
 
   // if msg is valid STUN message
   if (res.loadBuffer(msg)) {
-    // if msg is BINDING_RESPONSE_SUCCESS and valid one
+    // if msg is BINDING_RESPONSE_SUCCESS and valid content
     if (
       res.isBindingResponseSuccess({
         transactionId: tid,

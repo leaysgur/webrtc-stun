@@ -10,7 +10,7 @@ socket.on('message', msg => {
 
   // if msg is valid STUN message
   if (res.loadBuffer(msg)) {
-    // if msg is BINDING_RESPONSE_SUCCESS and valid one
+    // if msg is BINDING_RESPONSE_SUCCESS and valid content
     if (
       res.isBindingResponseSuccess({
         transactionId: tid,
