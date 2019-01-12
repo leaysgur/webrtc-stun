@@ -49,3 +49,30 @@ describe('writeAttrBuffer()', () => {
     });
   });
 });
+
+describe('generateFingerprint()', () => {
+  test('has always 4byte(32bit) length', () => {
+    [
+      utils.generateFingerprint(Buffer.from('')),
+      utils.generateFingerprint(Buffer.from('dummy')),
+    ].forEach($fp => {
+      expect($fp.length).toBe(4);
+    });
+  });
+});
+
+describe('generateIntegrity() / generateIntegrityWithFingerprint()', () => {
+  test('has always 20byte length', () => {
+    [
+      utils.generateIntegrity(Buffer.from(''), 'dummy'),
+      utils.generateIntegrity(Buffer.from('dummy'), 'dummy'),
+      utils.generateIntegrity(Buffer.from('dummy'.repeat(100)), 'dummy'),
+      utils.generateIntegrityWithFingerprint(
+        Buffer.from('dummy'.repeat(100)),
+        'dummy',
+      ),
+    ].forEach($integrity => {
+      expect($integrity.length).toBe(20);
+    });
+  });
+});

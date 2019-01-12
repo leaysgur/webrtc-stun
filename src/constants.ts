@@ -41,5 +41,5 @@ export const STUN_ATTRIBUTE_TYPE = {
   // RFC 5389 Optional types
   SOFTWARE: 0x8022,
   // ALTERNATE_SERVER: 0x8023,
-  // FINGERPRINT: 0x8028,
+  FINGERPRINT: 0x8028,
 };
