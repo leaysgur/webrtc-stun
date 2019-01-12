@@ -25,10 +25,10 @@ Currently only supports [RFC5389](https://tools.ietf.org/html/rfc5389) and still
 
 ## Usage
 
-```javascript
-const dgram = require('dgram');
-const stun = require('webrtc-stun');
-const pkg = require('../package.json');
+```typescript
+import * as dgram from 'dgram';
+import * as stun from '../src';
+import * as pkg from '../package.json';
 
 const socket = dgram.createSocket({ type: 'udp4' });
 const tid = stun.generateTransactionId();
@@ -38,12 +38,17 @@ socket.on('message', msg => {
 
   // if msg is valid STUN message
   if (res.loadBuffer(msg)) {
-    // if msg is BINDING_RESPONSE_SUCCESS and valid transaction
-    if (res.isBindingResponseSuccess(tid)) {
+    // if msg is BINDING_RESPONSE_SUCCESS and valid one
+    if (
+      res.isBindingResponseSuccess({
+        transactionId: tid,
+        fingerprint: true,
+      })
+    ) {
       const attr = res.getXorMappedAddressAttribute();
       // if msg includes attr
       if (attr) {
-        console.log('RESPONSE', res);
+        console.log('my rinfo', attr);
       }
     }
   }
@@ -53,8 +58,9 @@ socket.on('message', msg => {
 
 const req = stun
   .createBindingRequest(tid)
-  .setSoftwareAttribute(`${pkg.name}@${pkg.version}`);
-console.log('REQUEST', req);
+  .setSoftwareAttribute(`${pkg.name}@${pkg.version}`)
+  .setFingerprintAttribute();
+
 socket.send(req.toBuffer(), 19302, 'stun.l.google.com');
 ```
 
