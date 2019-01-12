@@ -262,7 +262,6 @@ export class StunMessage {
     // check if integrity w/ fingerprint
     return generateIntegrityWithFingerprint(
       this.toBuffer(),
-      this.header.length,
       integrityKey,
     ).equals(messageIntegrityAttr.value);
   }

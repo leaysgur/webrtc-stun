@@ -69,7 +69,6 @@ describe('generateIntegrity() / generateIntegrityWithFingerprint()', () => {
       utils.generateIntegrity(Buffer.from('dummy'.repeat(100)), 'dummy'),
       utils.generateIntegrityWithFingerprint(
         Buffer.from('dummy'.repeat(100)),
-        100,
         'dummy',
       ),
     ].forEach($integrity => {

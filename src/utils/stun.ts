@@ -134,10 +134,10 @@ export function generateIntegrity($msg: Buffer, integrityKey: string): Buffer {
 
 export function generateIntegrityWithFingerprint(
   $msg: Buffer,
-  msgLen: number,
   integrityKey: string,
 ): Buffer {
   // modify header length to ignore FINGERPRINT(8byte)
+  const msgLen = $msg.readUInt16BE(2);
   $msg.writeUInt16BE(msgLen - 8, 2);
   // without 32byte MESSAGE-INTEGRITY(24byte)
   // + FINGERPRINT: 8byte = (header: 4byte + value: 4byte)
