@@ -17,6 +17,18 @@ describe('createBindingRequest()', () => {
     const msg = createBindingRequest();
     expect(msg).toBeInstanceOf(StunMessage);
   });
+
+  test('throws if invalid tid passed', () => {
+    expect(() => {
+      createBindingRequest('invalid');
+    }).toThrow();
+  });
+
+  test('does not throw if valid tid passed', () => {
+    expect(() => {
+      createBindingRequest(generateTransactionId());
+    }).not.toThrow();
+  });
 });
 
 describe('generateTransactionId()', () => {

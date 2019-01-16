@@ -8,6 +8,12 @@ export function createBlank(): StunMessage {
 }
 
 export function createBindingRequest(tid?: string): StunMessage {
+  if (tid && tid.length !== 24) {
+    throw new TypeError(
+      '[webrtc-stun] The tid must be hex string which length is 24',
+    );
+  }
+
   return new StunMessage(
     new Header(STUN_MESSAGE_TYPE.BINDING_REQUEST, tid || generateTId(12)),
   );
