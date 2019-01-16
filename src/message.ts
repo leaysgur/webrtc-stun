@@ -99,7 +99,7 @@ export class StunMessage {
   }
 
   setMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
-    this.addAttribute(
+    this.attributes.push(
       new MappedAddressAttribute(rinfo.family, rinfo.port, rinfo.address),
     );
     return this;
@@ -111,7 +111,7 @@ export class StunMessage {
   }
 
   setUsernameAttribute(name: string): StunMessage {
-    this.addAttribute(new UsernameAttribute(name));
+    this.attributes.push(new UsernameAttribute(name));
     return this;
   }
   getUsernameAttribute(): UsernamePayload | null {
@@ -121,7 +121,7 @@ export class StunMessage {
   setMessageIntegrityAttribute(integrityKey: string): StunMessage {
     // add dummy first to disguise total length
     const attr = new MessageIntegrityAttribute();
-    this.addAttribute(attr);
+    this.attributes.push(attr);
 
     const $integrity = generateIntegrity(this.toBuffer(), integrityKey);
     attr.loadBuffer($integrity);
@@ -137,7 +137,7 @@ export class StunMessage {
   setFingerprintAttribute(): StunMessage {
     // add dummy first to disguise total length
     const attr = new FingerprintAttribute();
-    this.addAttribute(attr);
+    this.attributes.push(attr);
 
     const $fp = generateFingerprint(this.toBuffer());
     attr.loadBuffer($fp);
@@ -151,7 +151,7 @@ export class StunMessage {
   }
 
   setXorMappedAddressAttribute(rinfo: RemoteInfo): StunMessage {
-    this.addAttribute(
+    this.attributes.push(
       new XorMappedAddressAttribute(rinfo.family, rinfo.port, rinfo.address),
     );
     return this;
@@ -163,7 +163,7 @@ export class StunMessage {
   }
 
   setSoftwareAttribute(name: string): StunMessage {
-    this.addAttribute(new SoftwareAttribute(name));
+    this.attributes.push(new SoftwareAttribute(name));
     return this;
   }
   getSoftwareAttribute(): SoftwarePayload | null {
@@ -254,10 +254,6 @@ export class StunMessage {
     }
 
     return true;
-  }
-
-  private addAttribute(attr: Attribute) {
-    this.attributes.push(attr);
   }
 
   private validateMessageIntegrity(integrityKey: string): boolean {
