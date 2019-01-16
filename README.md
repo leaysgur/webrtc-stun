@@ -6,9 +6,20 @@
 npm i webrtc-stun
 ```
 
-Currently only supports [RFC5389](https://tools.ietf.org/html/rfc5389) and still WIP.
+## Supported methods
+### [RFC5389](https://tools.ietf.org/html/rfc5389#section-18.1)
+- BINDING
+  - REQUEST
+  - RESPONSE_SUCCESS
+  - RESPONSE_ERROR
 
-## Supported attribute
+## Not supported yet
+### [RFC5389](https://tools.ietf.org/html/rfc5389#section-18.1)
+- BINDING
+  - INDICATION
+
+## Supported attributes
+### [RFC5389](https://tools.ietf.org/html/rfc5389#section-18.2)
 - [MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.1)
 - [XOR-MAPPED-ADDRESS](https://tools.ietf.org/html/rfc5389#section-15.2)
 - [USERNAME](https://tools.ietf.org/html/rfc5389#section-15.3)
@@ -17,6 +28,7 @@ Currently only supports [RFC5389](https://tools.ietf.org/html/rfc5389) and still
 - [FINGERPRINT](https://tools.ietf.org/html/rfc5389#section-15.5)
 
 ## Not supported yet
+### [RFC5389](https://tools.ietf.org/html/rfc5389#section-18.2)
 - [ERROR-CODE](https://tools.ietf.org/html/rfc5389#section-15.6)
 - [REALM](https://tools.ietf.org/html/rfc5389#section-15.7)
 - [NONCE](https://tools.ietf.org/html/rfc5389#section-15.8)
@@ -64,4 +76,4 @@ const req = stun
 socket.send(req.toBuffer(), 19302, 'stun.l.google.com');
 ```
 
-See also `examples` directory.
+See also `/examples` directory.
