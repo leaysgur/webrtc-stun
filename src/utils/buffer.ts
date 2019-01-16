@@ -1,5 +1,10 @@
 export function bufferXor(a: Buffer, b: Buffer): Buffer {
-  // a and b should have same length
+  if (a.length !== b.length) {
+    throw new TypeError(
+      '[webrtc-stun] You can not XOR buffers which length are different',
+    );
+  }
+
   const length = a.length;
   const buffer = Buffer.allocUnsafe(length);
 
