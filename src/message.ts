@@ -223,9 +223,16 @@ export class StunMessage {
       if (loadedAttrType.has(type)) {
         continue;
       }
+      // ignore rest attrs will appearing after MESSAGE_INTEGRITY except for FINGERPRINT
+      if (
+        loadedAttrType.has(STUN_ATTRIBUTE_TYPE.MESSAGE_INTEGRITY) &&
+        type !== STUN_ATTRIBUTE_TYPE.FINGERPRINT
+      ) {
+        return true;
+      }
 
       const attr = this.getBlankAttributeByType(type);
-      // skip not supported
+      // skip not supported attr
       if (attr === null) {
         console.log(
           `[webrtc-stun] Attr type 0x${type.toString(
