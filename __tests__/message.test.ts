@@ -480,7 +480,7 @@ describe('loadBuffer()', () => {
     expect(blank.loadBuffer($buf)).toBeFalsy();
   });
 
-  test('ignore duplicated attr', () => {
+  test('ignores duplicated attr', () => {
     const msg = stun
       .createBindingRequest()
       .setSoftwareAttribute('test')
@@ -489,5 +489,48 @@ describe('loadBuffer()', () => {
     const blank = stun.createBlank();
     expect(blank.loadBuffer(msg.toBuffer())).toBeTruthy();
     expect(blank.getSoftwareAttribute()).toEqual({ value: 'test' });
+  });
+
+  test('ignores attrs after MESSAGE-INTEGRITY', () => {
+    const msg = stun
+      .createBindingRequest()
+      .setMessageIntegrityAttribute('dummy')
+      .setMappedAddressAttribute({
+        family: 'IPv4',
+        port: 12345,
+        address: '0.0.0.0',
+      })
+      .setSoftwareAttribute('test');
+
+    const blank = stun.createBlank();
+    expect(blank.loadBuffer(msg.toBuffer())).toBeTruthy();
+    expect(blank.getSoftwareAttribute()).toBeNull();
+    expect(blank.getMappedAddressAttribute()).toBeNull();
+  });
+
+  test('ignores attrs after MESSAGE-INTEGRITY except for FINGERPRINT', () => {
+    const msg = stun
+      .createBindingRequest()
+      .setMessageIntegrityAttribute('dummy')
+      .setFingerprintAttribute()
+      .setSoftwareAttribute('test');
+
+    const blank = stun.createBlank();
+    expect(blank.loadBuffer(msg.toBuffer())).toBeTruthy();
+    expect(blank.getSoftwareAttribute()).toBeNull();
+    expect(blank.getFingerprintAttribute()).not.toBeNull();
+  });
+
+  test('ignores FINGERPRINT after MESSAGE-INTEGRITY if it appears too late', () => {
+    const msg = stun
+      .createBindingRequest()
+      .setMessageIntegrityAttribute('dummy')
+      .setSoftwareAttribute('test')
+      .setFingerprintAttribute();
+
+    const blank = stun.createBlank();
+    expect(blank.loadBuffer(msg.toBuffer())).toBeTruthy();
+    expect(blank.getSoftwareAttribute()).toBeNull();
+    expect(blank.getFingerprintAttribute()).toBeNull();
   });
 });
